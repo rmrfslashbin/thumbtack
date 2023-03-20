@@ -1,5 +1,6 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/rmrfslashbin/thumbtack.svg)](https://pkg.go.dev/github.com/rmrfslashbin/thumbtack)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rmrfslashbin/thumbtack)](https://goreportcard.com/report/github.com/rmrfslashbin/thumbtack)
+[![codecov](https://codecov.io/gh/rmrfslashbin/thumbtack/branch/main/graph/badge.svg?token=63I217ZCRL)](https://codecov.io/gh/rmrfslashbin/thumbtack)
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/rmrfslashbin/thumbtack/master/LICENSE)
 # thumbtack
 Thumbtack is a Go client for https://pinboard.in.
