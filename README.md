@@ -1,5 +1,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/rmrfslashbin/thumbtack.svg)](https://pkg.go.dev/github.com/rmrfslashbin/thumbtack)
-
+(https://raw.githubusercontent.com/rs/zerolog/master/LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/rmrfslashbin/thumbtack)](https://goreportcard.com/report/github.com/rmrfslashbin/thumbtack)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 # thumbtack
 Thumbtack is a Go client for https://pinboard.in.
 

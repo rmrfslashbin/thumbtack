@@ -3,7 +3,7 @@ package constants
 const (
 	// Package constants
 	Useragent = "github.com/rmrfslashbin/thumbtack@v" + Version
-	Version   = "1.0.0"
+	Version   = "1.0.1"
 
 	// Default supported endpoint
 	Endpoint = "https://api.pinboard.in/v1"
