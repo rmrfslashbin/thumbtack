@@ -1,5 +1,7 @@
 package thumbtack
 
+import "fmt"
+
 // ErrBadEndpoint is returned when the endpoint is not valid
 type ErrBadEndpoint struct {
 	Err error
@@ -19,26 +21,27 @@ func (e *ErrBadEndpoint) Error() string {
 
 // ErrBadStatusCode is returned when the status code is not valid
 type ErrBadStatusCode struct {
-	StatusCode int
-	Status     string
 	Err        error
 	Msg        string
+	Status     string
+	StatusCode int
 }
 
 // Error returns the error message
 func (e *ErrBadStatusCode) Error() string {
 	if e.Msg == "" {
-		e.Msg = "endpoint returned a bad status code"
+		e.Msg = "bad status code"
 	}
 	if e.StatusCode != 0 {
-		e.Msg += ": " + e.Status
+		e.Msg += fmt.Sprintf(": %d", e.StatusCode)
 	}
 	if e.Status != "" {
-		e.Msg += ": " + e.Status
+		e.Msg += fmt.Sprintf(" (%s)", e.Status)
 	}
 	if e.Err != nil {
 		e.Msg += ": " + e.Err.Error()
 	}
+
 	return e.Msg
 }
 
