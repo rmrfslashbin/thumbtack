@@ -7,8 +7,8 @@ import (
 	"github.com/rmrfslashbin/thumbtack/internal/constants"
 )
 
-// NotesList returns a list of the user's notes
-// https://pinboard.in/api/#notes_list
+// TagsGet returns a full list of the user's tags along with the number of times they were used.
+// https://pinboard.in/api/#tags_get
 func (c *Client) TagsGet() (*Tags, error) {
 	// Set up the query parameters
 	v := url.Values{}
