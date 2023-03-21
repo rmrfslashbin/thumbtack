@@ -81,6 +81,33 @@ func TestNotesByIdBadAPICall(t *testing.T) {
 	}
 }
 
+func TestNotesByIdBadConfig(t *testing.T) {
+	useragent := "test/1.0"
+	token := "foo"
+	config := NewConfig()
+	config.SetAPI("NotesById", "")
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithConfigs(config),
+		WithEndpoint(&url.URL{}),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.NotesById("xxxx67e342662e6c239c")
+
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected error to be of type ErrApiNotSet, got %T", err)
+	}
+}
+
 func TestNotesByIdWithBadData(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -185,6 +212,33 @@ func TestNotesListBadAPICall(t *testing.T) {
 
 	if _, err := client.NotesList(); err == nil {
 		t.Fatalf("expected error to not be nil")
+	}
+}
+
+func TestNotesListBadConfig(t *testing.T) {
+	useragent := "test/1.0"
+	token := "foo"
+	config := NewConfig()
+	config.SetAPI("NotesList", "")
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithConfigs(config),
+		WithEndpoint(&url.URL{}),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.NotesList()
+
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected error to be of type ErrApiNotSet, got %T", err)
 	}
 }
 
