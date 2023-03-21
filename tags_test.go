@@ -366,17 +366,17 @@ func TestTagsRenameBadAPICall(t *testing.T) {
 	}
 }
 
-func TestTagsRenamesWithBadData(t *testing.T) {
+func TestTagsRenameWithBadData(t *testing.T) {
 	token := "test:abc123"
 	useragent := "test/1.0"
-	tagsGetResp := "garbage"
+	tagsRenameResp := "garbage"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.TagsGet {
+		if r.URL.Path != constants.TagsRename {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
 
-		fmt.Fprint(w, tagsGetResp)
+		fmt.Fprint(w, tagsRenameResp)
 	}))
 	defer ts.Close()
 
@@ -398,5 +398,41 @@ func TestTagsRenamesWithBadData(t *testing.T) {
 	new := "new"
 	if _, err := client.TagsRename(&TagsRenameInput{Old: &old, New: &new}); err == nil {
 		t.Fatalf("expected error to not be nil")
+	}
+}
+
+func TestTagsRenameResultNotDone(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	tagsRenameResp := `{"result":"something else"}`
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != constants.TagsRename {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, tagsRenameResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(token),
+		WithLogger(&log),
+		WithUserAgent(useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	old := "old"
+	new := "new"
+	_, err = client.TagsRename(&TagsRenameInput{Old: &old, New: &new})
+	if _, ok := err.(*ErrUnexpectedResponse); !ok {
+		t.Fatalf("expected error to be of type ErrUnexpectedResponse, got %T", err)
 	}
 }
