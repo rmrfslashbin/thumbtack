@@ -8,12 +8,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
 func TestUserSecret(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	userSecretResp := `{"result":"a6131d72761167f08be4"}`
@@ -79,7 +78,7 @@ func TestUsersBadAPICall(t *testing.T) {
 }
 
 func TestUserSecretBadResults(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	userSecretResp := "bad json"

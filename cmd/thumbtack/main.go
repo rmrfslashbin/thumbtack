@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/alecthomas/kong"
+	"github.com/rmrfslashbin/thumbtack"
 	"github.com/rmrfslashbin/thumbtack/cmd/thumbtack/clictx"
 	"github.com/rmrfslashbin/thumbtack/cmd/thumbtack/root"
-	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
@@ -61,7 +61,7 @@ func main() {
 		}
 	}
 
-	config := configs.New()
+	config := thumbtack.NewConfig()
 	var userAgent string
 	if cli.UserAgent != nil {
 		userAgent = *cli.UserAgent

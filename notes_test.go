@@ -8,12 +8,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
 func TestNotesById(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 
 	token := "test:abc123"
 	useragent := "test/1.0"
@@ -82,7 +81,7 @@ func TestNotesByIdBadAPICall(t *testing.T) {
 }
 
 func TestNotesByIdWithBadData(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	notesByIdResp := `garbage`
@@ -120,7 +119,7 @@ func TestNotesByIdWithBadData(t *testing.T) {
 }
 
 func TestNotesList(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	notesListResp := `{"count":1,"notes":[{"0":"xxxx67e342662e6c239c","id":"xxxx67e342662e6c239c","1":"xxxx910a03859fd9e80a","hash":"xxxx910a03859fd9e80a","2":"Test Note 01","title":"Test Note 01","3":40,"length":40,"4":"2023-03-19 14:35:16","created_at":"2023-03-19 14:35:16","5":"2023-03-19 14:35:16","updated_at":"2023-03-19 14:35:16"}]}`
@@ -188,7 +187,7 @@ func TestNotesListBadAPICall(t *testing.T) {
 }
 
 func TestNotesListWithBadData(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	notesListResp := `garbage`

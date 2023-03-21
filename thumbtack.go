@@ -10,7 +10,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
@@ -20,7 +19,7 @@ type Option func(c *Client)
 // Client provides access to the Thumbtack API
 type Client struct {
 	// configs. the configs for the controller
-	configs *configs.Configs
+	configs *Configs
 
 	// dateTimeFormat. the format of the time in the response. dateTimeFormat is always RFC3339
 	dateTimeFormat string
@@ -63,7 +62,7 @@ func New(opts ...Option) (*Client, error) {
 	}
 
 	if client.configs == nil {
-		client.configs = configs.New()
+		client.configs = NewConfig()
 	}
 
 	// set up token if not provided
@@ -89,7 +88,7 @@ func New(opts ...Option) (*Client, error) {
 	return client, nil
 }
 
-func WithConfigs(configs *configs.Configs) Option {
+func WithConfigs(configs *Configs) Option {
 	return func(c *Client) {
 		c.configs = configs
 	}

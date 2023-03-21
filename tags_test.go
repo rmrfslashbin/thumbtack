@@ -9,12 +9,11 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
 func TestTagsDelete(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsDeleteResp := `{"result":"done"}`
@@ -81,7 +80,7 @@ func TestTagsDeleteBadAPICall(t *testing.T) {
 }
 
 func TestTagsDeleteNotDone(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsDeleteResp := `{"result":"somethingelse"}`
@@ -119,7 +118,7 @@ func TestTagsDeleteNotDone(t *testing.T) {
 }
 
 func TestTagsDeleteWithBadData(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsDeleteResp := "garbage"
@@ -157,7 +156,7 @@ func TestTagsDeleteWithBadData(t *testing.T) {
 }
 
 func TestTagsGet(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsGetResp := `{"api":1,"books":1,"custom":1,"haproxy":2,"homepage":1,"logging":1}`
@@ -223,7 +222,7 @@ func TestTagsGetBadAPICall(t *testing.T) {
 }
 
 func TestTagsGetWithBadData(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsGetResp := "garbage"
@@ -261,7 +260,7 @@ func TestTagsGetWithBadData(t *testing.T) {
 }
 
 func TestTagsRename(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsRenameResp := `{"result":"done"}`
@@ -397,7 +396,7 @@ func TestTagsRenameBadAPICall(t *testing.T) {
 }
 
 func TestTagsRenameWithBadData(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsRenameResp := "garbage"
@@ -437,7 +436,7 @@ func TestTagsRenameWithBadData(t *testing.T) {
 }
 
 func TestTagsRenameResultNotDone(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsRenameResp := `{"result":"something else"}`

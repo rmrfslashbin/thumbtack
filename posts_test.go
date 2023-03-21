@@ -10,12 +10,11 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
 func TestPostsAdd(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsAddResp := `{"result_code":"done"}`
@@ -76,7 +75,7 @@ func TestPostsAdd(t *testing.T) {
 }
 
 func TestPostsAll(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsAllResp := `[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"},
@@ -137,7 +136,7 @@ func TestPostsAll(t *testing.T) {
 }
 
 func TestPostsDates(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsDatesResp := `{"user":"test","tag":"","dates":{"2023-04-20":1,"2023-04-21":4}}`
@@ -184,7 +183,7 @@ func TestPostsDates(t *testing.T) {
 }
 
 func TestPostsDelete(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsDeleteResp := `{"result_code":"done"}`
@@ -231,7 +230,7 @@ func TestPostsDelete(t *testing.T) {
 }
 
 func TestPostsGet(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsGetResp := `{"date":"2023-03-20T16:30:35Z","user":"test","posts":[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"}]}`
@@ -286,7 +285,7 @@ func TestPostsGet(t *testing.T) {
 }
 
 func TestPostsRecent(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsRecentResp := `{"date":"2023-03-20T16:30:35Z","user":"test","posts":[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"}]}`
@@ -335,7 +334,7 @@ func TestPostsRecent(t *testing.T) {
 }
 
 func TestPostsSuggest(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsSuggestResp := `[{"popular":["Unread","pinboard","bookmarks"]},{"recommended":["Unread","pinboard","bookmarks"]}]`
@@ -382,7 +381,7 @@ func TestPostsSuggest(t *testing.T) {
 }
 
 func TestPostsUpdate(t *testing.T) {
-	config := configs.New()
+	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsUpdateResp := `{"update_time":"2023-03-20T16:44:37Z"}`

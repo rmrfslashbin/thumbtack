@@ -1,4 +1,4 @@
-package configs
+package thumbtack
 
 import "strings"
 
@@ -58,7 +58,7 @@ func (e *ErrUnknownApi) Error() string {
 }
 
 // New returns a new Configs struct
-func New() *Configs {
+func NewConfig() *Configs {
 	useragent := "github.com/rmrfslashbin/thumbtack@v"
 	version := "1.0.1"
 
