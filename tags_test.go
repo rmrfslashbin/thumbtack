@@ -270,7 +270,7 @@ func TestTagsGetBadConfig(t *testing.T) {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
 	}
 
-	_, err = client.TagsDelete("api")
+	_, err = client.TagsGet()
 
 	if _, ok := err.(*ErrApiNotSet); !ok {
 		t.Fatalf("expected error to be of type ErrApiNotSet, got %T", err)
