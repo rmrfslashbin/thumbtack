@@ -74,6 +74,218 @@ func TestPostsAdd(t *testing.T) {
 	}
 }
 
+func TestPostsAddInputNil(t *testing.T) {
+
+	token := "test:abc123"
+
+	client, err := New(
+		WithToken(&token),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	if _, err := client.PostsAdd(nil); err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+
+}
+
+func TestPostsAddInputUrlNil(t *testing.T) {
+
+	token := "test:abc123"
+
+	client, err := New(
+		WithToken(&token),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	//addUrl := "https://example.com"
+	addDescr := "Example Description"
+	addTitle := "Example Title"
+	addTrue := true
+	addTime := time.Now()
+	if _, err := client.PostsAdd(&PostsAddInput{
+		Url:         nil, //&addUrl,
+		Title:       &addTitle,
+		Description: &addDescr,
+		Replace:     &addTrue,
+		Shared:      &addTrue,
+		Tags:        []string{"test", "example"},
+		Timestamp:   &addTime,
+		ToRead:      &addTrue,
+	}); err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+
+}
+
+func TestPostsAddInputTitleNil(t *testing.T) {
+
+	token := "test:abc123"
+
+	client, err := New(
+		WithToken(&token),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	addUrl := "https://example.com"
+	addDescr := "Example Description"
+	//addTitle := "Example Title"
+	addTrue := true
+	addTime := time.Now()
+	if _, err := client.PostsAdd(&PostsAddInput{
+		Url:         &addUrl,
+		Title:       nil, //&addTitle,
+		Description: &addDescr,
+		Replace:     &addTrue,
+		Shared:      &addTrue,
+		Tags:        []string{"test", "example"},
+		Timestamp:   &addTime,
+		ToRead:      &addTrue,
+	}); err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+
+}
+
+func TestPostsAddInputFieldsTrue(t *testing.T) {
+
+	token := "test:abc123"
+
+	client, err := New(
+		WithToken(&token),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	addUrl := "https://example.com"
+	addDescr := "Example Description"
+	addTitle := "Example Title"
+	//addTrue := true
+	addFalse := false
+	addTime := time.Now()
+	if _, err := client.PostsAdd(&PostsAddInput{
+		Url:         &addUrl,
+		Title:       &addTitle,
+		Description: &addDescr,
+		Replace:     &addFalse,
+		Shared:      &addFalse,
+		Tags:        []string{"test", "example"},
+		Timestamp:   &addTime,
+		ToRead:      &addFalse,
+	}); err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+
+}
+
+func TestPostsAddInputTagsGet100(t *testing.T) {
+
+	token := "test:abc123"
+
+	client, err := New(
+		WithToken(&token),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	addUrl := "https://example.com"
+	addDescr := "Example Description"
+	addTitle := "Example Title"
+	addTrue := true
+	addTime := time.Now()
+
+	var tags []string
+	for i := 0; i < 101; i++ {
+		tags = append(tags, "test")
+	}
+
+	if _, err := client.PostsAdd(&PostsAddInput{
+		Url:         &addUrl,
+		Title:       &addTitle,
+		Description: &addDescr,
+		Replace:     &addTrue,
+		Shared:      &addTrue,
+		Tags:        tags,
+		Timestamp:   &addTime,
+		ToRead:      &addTrue,
+	}); err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+
+}
+
+func TestPostsAddInputTimestampGte10(t *testing.T) {
+
+	token := "test:abc123"
+
+	client, err := New(
+		WithToken(&token),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	addUrl := "https://example.com"
+	addDescr := "Example Description"
+	addTitle := "Example Title"
+	addTrue := true
+	addTime := time.Now().Add(time.Hour * 24 * 365 * 10)
+	if _, err := client.PostsAdd(&PostsAddInput{
+		Url:         &addUrl,
+		Title:       &addTitle,
+		Description: &addDescr,
+		Replace:     &addTrue,
+		Shared:      &addTrue,
+		Tags:        []string{"test", "example"},
+		Timestamp:   &addTime,
+		ToRead:      &addTrue,
+	}); err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+
+}
+
+func TestPostsAddBadApiEndpoint(t *testing.T) {
+	token := "test:abc123"
+	config := NewConfig()
+	config.SetAPI("PostsAdd", "")
+
+	client, err := New(
+		WithToken(&token),
+		WithConfigs(config),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	addUrl := "https://example.com"
+	addDescr := "Example Description"
+	addTitle := "Example Title"
+	addTrue := true
+	addTime := time.Now()
+	if _, err := client.PostsAdd(&PostsAddInput{
+		Url:         &addUrl,
+		Title:       &addTitle,
+		Description: &addDescr,
+		Replace:     &addTrue,
+		Shared:      &addTrue,
+		Tags:        []string{"test", "example"},
+		Timestamp:   &addTime,
+		ToRead:      &addTrue,
+	}); err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+
+}
+
 func TestPostsAll(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
