@@ -78,6 +78,33 @@ func TestUsersBadAPICall(t *testing.T) {
 	}
 }
 
+func TestUsersBadConfig(t *testing.T) {
+	useragent := "test/1.0"
+	token := "foo"
+	config := NewConfig()
+	config.SetAPI("UserSecret", "")
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithConfigs(config),
+		WithEndpoint(&url.URL{}),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.UserSecret()
+
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected error to be of type ErrApiNotSet, got %T", err)
+	}
+}
+
 func TestUserSecretBadResults(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
