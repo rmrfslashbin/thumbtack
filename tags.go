@@ -7,37 +7,6 @@ import (
 	"github.com/rmrfslashbin/thumbtack/internal/constants"
 )
 
-// TagsGet returns a full list of the user's tags along with the number of times they were used.
-// https://pinboard.in/api/#tags_get
-func (c *Client) TagsGet() (*Tags, error) {
-	// Set up the query parameters
-	v := url.Values{}
-	v.Set("format", c.format)
-	v.Set("auth_token", *c.token)
-
-	// Call the endpoint
-	body, err := c.callEndpoint(constants.TagsGet, v.Encode())
-	if err != nil {
-		c.log.Error().
-			Str("function", "thumbtack::TagsGet").
-			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.TagsGet).
-			Str("query", v.Encode()).
-			Msg("error calling endpoint")
-		return nil, err
-	}
-
-	// Unmarshal the response
-	tags := &Tags{}
-	err = json.Unmarshal(*body, tags)
-	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
-	}
-
-	return tags, nil
-}
-
 // TagsDelete deletes a tag from the user's account
 // https://pinboard.in/api/#tags_delete
 func (c *Client) TagsDelete(tag string) (*Result, error) {
@@ -74,6 +43,37 @@ func (c *Client) TagsDelete(tag string) (*Result, error) {
 	return result, nil
 }
 
+// TagsGet returns a full list of the user's tags along with the number of times they were used.
+// https://pinboard.in/api/#tags_get
+func (c *Client) TagsGet() (*Tags, error) {
+	// Set up the query parameters
+	v := url.Values{}
+	v.Set("format", c.format)
+	v.Set("auth_token", *c.token)
+
+	// Call the endpoint
+	body, err := c.callEndpoint(constants.TagsGet, v.Encode())
+	if err != nil {
+		c.log.Error().
+			Str("function", "thumbtack::TagsGet").
+			Str("endpoint", c.endpoint.String()).
+			Str("path", constants.TagsGet).
+			Str("query", v.Encode()).
+			Msg("error calling endpoint")
+		return nil, err
+	}
+
+	// Unmarshal the response
+	tags := &Tags{}
+	err = json.Unmarshal(*body, tags)
+	if err != nil {
+		c.log.Error().Msg("error unmashalling response")
+		return nil, err
+	}
+
+	return tags, nil
+}
+
 // TagsRenameInput is the input for the TagsRename function
 type TagsRenameInput struct {
 	// Old is the tag to rename
@@ -86,6 +86,10 @@ type TagsRenameInput struct {
 // TagsRename renames a tag
 // https://pinboard.in/api/#tags_rename
 func (c *Client) TagsRename(input *TagsRenameInput) (*Result, error) {
+	if input == nil {
+		return nil, &ErrInvalidInput{}
+	}
+
 	if input.Old == nil {
 		return nil, &ErrMissingInputField{Field: "old"}
 	}
