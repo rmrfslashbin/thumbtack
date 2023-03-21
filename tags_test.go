@@ -455,6 +455,35 @@ func TestTagsRenameBadAPICall(t *testing.T) {
 	}
 }
 
+func TestTagsRenameBadConfig(t *testing.T) {
+	useragent := "test/1.0"
+	token := "foo"
+	config := NewConfig()
+	config.SetAPI("TagsRename", "")
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithConfigs(config),
+		WithEndpoint(&url.URL{}),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	old := "old"
+	new := "new"
+	_, err = client.TagsRename(&TagsRenameInput{Old: &old, New: &new})
+
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected error to be of type ErrApiNotSet, got %T", err)
+	}
+}
+
 func TestTagsRenameWithBadData(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
