@@ -80,6 +80,33 @@ func TestTagsDeleteBadAPICall(t *testing.T) {
 	}
 }
 
+func TestTagsDeleteBadConfig(t *testing.T) {
+	useragent := "test/1.0"
+	token := "foo"
+	config := NewConfig()
+	config.SetAPI("TagsDelete", "")
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithConfigs(config),
+		WithEndpoint(&url.URL{}),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.TagsDelete("api")
+
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected error to be of type ErrApiNotSet, got %T", err)
+	}
+}
+
 func TestTagsDeleteNotDone(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -220,6 +247,33 @@ func TestTagsGetBadAPICall(t *testing.T) {
 
 	if _, err := client.TagsGet(); err == nil {
 		t.Fatalf("expected error to not be nil")
+	}
+}
+
+func TestTagsGetBadConfig(t *testing.T) {
+	useragent := "test/1.0"
+	token := "foo"
+	config := NewConfig()
+	config.SetAPI("TagsGet", "")
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithConfigs(config),
+		WithEndpoint(&url.URL{}),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.TagsDelete("api")
+
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected error to be of type ErrApiNotSet, got %T", err)
 	}
 }
 
