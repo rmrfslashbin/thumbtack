@@ -46,7 +46,41 @@ func TestSetUnknownApi(t *testing.T) {
 func TestEmptyApi(t *testing.T) {
 	config := NewConfig()
 	config.SetAPI("NotesById", "")
-	if _, err := config.GetAPI("NotesById"); err == nil {
+	_, err := config.GetAPI("NotesById")
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected error to be of type ErrApiNotSet")
+	}
+	if err == nil {
 		t.Fatalf("expected error to not be nil")
+	}
+}
+
+func TestErrApiNotSetNoMsg(t *testing.T) {
+	err := &ErrApiNotSet{}
+	if err.Error() != "requested api is not set or empty" {
+		t.Fatalf("expected error message to be 'requested api is not set or empty', got '%s'", err.Error())
+	}
+}
+
+func TestErrApiNotSetApiMsg(t *testing.T) {
+	err := &ErrApiNotSet{Api: "foo", Msg: "bar"}
+	expected := "bar: foo"
+	if err.Error() != expected {
+		t.Fatalf("expected error message to be 'foo', got '%s'", expected)
+	}
+}
+
+func TestErrUnknownApiNoMsg(t *testing.T) {
+	err := &ErrUnknownApi{}
+	if err.Error() != "requested api is not known or defined" {
+		t.Fatalf("expected error message to be 'requested api is not known or defined', got '%s'", err.Error())
+	}
+}
+
+func TestErrUnknownApiApiMsg(t *testing.T) {
+	err := &ErrUnknownApi{Api: "foo", Msg: "bar"}
+	expected := "bar: foo"
+	if err.Error() != expected {
+		t.Fatalf("expected error message to be 'foo', got '%s'", expected)
 	}
 }
