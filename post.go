@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/rmrfslashbin/thumbtack/internal/constants"
 )
 
 // Functions relate to the /post API endpoint
@@ -117,12 +115,17 @@ func (c *Client) PostsAdd(input *PostsAddInput) (*Result, error) {
 	}
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.PostsAdd, v.Encode())
+	postsAdd, err := c.configs.GetAPI("PostsAdd")
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.callEndpoint(postsAdd, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::PostsAdd").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.PostsAdd).
+			Str("path", postsAdd).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err
@@ -209,12 +212,16 @@ func (c *Client) PostsAll(input *PostsAllInput) (*[]Bookmark, error) {
 	}
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.PostsAll, v.Encode())
+	postsAll, err := c.configs.GetAPI("PostsAll")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(postsAll, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::PostsAll").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.PostsAll).
+			Str("path", postsAll).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err
@@ -248,12 +255,16 @@ func (c *Client) PostsDates(tags []string) (*Dates, error) {
 	}
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.PostsDates, v.Encode())
+	postsDates, err := c.configs.GetAPI("PostsDates")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(postsDates, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::PostsDates").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.PostsDates).
+			Str("path", postsDates).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err
@@ -280,12 +291,16 @@ func (c *Client) PostsDelete(urlToDelete string) (*Result, error) {
 	v.Set("url", urlToDelete)
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.PostsDelete, v.Encode())
+	postsDelete, err := c.configs.GetAPI("PostsDelete")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(postsDelete, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::PostsDelete").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.PostsDelete).
+			Str("path", postsDelete).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err
@@ -359,12 +374,16 @@ func (c *Client) PostsGet(input *PostsGetInput) (*Posts, error) {
 	}
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.PostsGet, v.Encode())
+	postsGet, err := c.configs.GetAPI("PostsGet")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(postsGet, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::PostsGet").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.PostsGet).
+			Str("path", postsGet).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err
@@ -420,12 +439,16 @@ func (c *Client) PostsRecent(input *PostsRecentInput) (*Posts, error) {
 	}
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.PostsRecent, v.Encode())
+	postsRecent, err := c.configs.GetAPI("PostsRecent")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(postsRecent, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::PostsRecent").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.PostsRecent).
+			Str("path", postsRecent).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err
@@ -452,12 +475,16 @@ func (c *Client) PostsSuggest(urlToSuggest string) (*Suggestions, error) {
 	v.Set("url", urlToSuggest)
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.PostsSuggest, v.Encode())
+	postsSuggest, err := c.configs.GetAPI("PostsSuggest")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(postsSuggest, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::PostsSuggest").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.PostsSuggest).
+			Str("path", postsSuggest).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err
@@ -484,12 +511,16 @@ func (c *Client) PostsUpdate() (*UpdateTime, error) {
 	v.Set("auth_token", *c.token)
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.PostsUpdate, v.Encode())
+	postsUpdate, err := c.configs.GetAPI("PostsUpdate")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(postsUpdate, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::PostsUpdate").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.PostsUpdate).
+			Str("path", postsUpdate).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err

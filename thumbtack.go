@@ -10,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/rmrfslashbin/thumbtack/internal/constants"
+	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
@@ -19,6 +19,9 @@ type Option func(c *Client)
 
 // Client provides access to the Thumbtack API
 type Client struct {
+	// configs. the configs for the controller
+	configs *configs.Configs
+
 	// dateTimeFormat. the format of the time in the response. dateTimeFormat is always RFC3339
 	dateTimeFormat string
 
@@ -59,6 +62,10 @@ func New(opts ...Option) (*Client, error) {
 		client.log = &log
 	}
 
+	if client.configs == nil {
+		client.configs = configs.New()
+	}
+
 	// set up token if not provided
 	if client.token == nil {
 		return nil, &ErrNoToken{}
@@ -66,7 +73,7 @@ func New(opts ...Option) (*Client, error) {
 
 	// set up endpoint
 	if client.endpoint == nil {
-		endpoint, err := url.Parse(constants.Endpoint)
+		endpoint, err := url.Parse(client.configs.GetEndpoint())
 		if err != nil {
 			return nil, &ErrBadEndpoint{}
 		}
@@ -75,11 +82,17 @@ func New(opts ...Option) (*Client, error) {
 
 	// set up userAgent if not provided
 	if client.userAgent == nil {
-		ua := constants.Useragent
+		ua := client.configs.GetUserAgent()
 		client.userAgent = &ua
 	}
 
 	return client, nil
+}
+
+func WithConfigs(configs *configs.Configs) Option {
+	return func(c *Client) {
+		c.configs = configs
+	}
 }
 
 // WithEndpoint sets the endpoint for the controller

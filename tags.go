@@ -3,8 +3,6 @@ package thumbtack
 import (
 	"encoding/json"
 	"net/url"
-
-	"github.com/rmrfslashbin/thumbtack/internal/constants"
 )
 
 // TagsDelete deletes a tag from the user's account
@@ -17,12 +15,16 @@ func (c *Client) TagsDelete(tag string) (*Result, error) {
 	v.Set("tag", tag)
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.TagsDelete, v.Encode())
+	tagsDelete, err := c.configs.GetAPI("TagsDelete")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(tagsDelete, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::TagsDelete").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.TagsDelete).
+			Str("path", tagsDelete).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err
@@ -52,12 +54,16 @@ func (c *Client) TagsGet() (*Tags, error) {
 	v.Set("auth_token", *c.token)
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.TagsGet, v.Encode())
+	tagsGet, err := c.configs.GetAPI("TagsGet")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(tagsGet, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::TagsGet").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.TagsGet).
+			Str("path", tagsGet).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err
@@ -106,12 +112,16 @@ func (c *Client) TagsRename(input *TagsRenameInput) (*Result, error) {
 	v.Set("new", *input.New)
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.TagsRename, v.Encode())
+	tagsRename, err := c.configs.GetAPI("TagsRename")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(tagsRename, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::TagsRename").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.TagsRename).
+			Str("path", tagsRename).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err

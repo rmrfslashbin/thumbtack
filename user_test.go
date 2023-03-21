@@ -8,16 +8,21 @@ import (
 	"os"
 	"testing"
 
-	"github.com/rmrfslashbin/thumbtack/internal/constants"
+	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
 func TestUserSecret(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	userSecretResp := `{"result":"a6131d72761167f08be4"}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.UserSecret {
+		api, err := config.GetAPI("UserSecret")
+		if err != nil {
+			t.Fatalf("failed to get UserSecret api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -74,11 +79,16 @@ func TestUsersBadAPICall(t *testing.T) {
 }
 
 func TestUserSecretBadResults(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	userSecretResp := "bad json"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.UserSecret {
+		api, err := config.GetAPI("UserSecret")
+		if err != nil {
+			t.Fatalf("failed to get UserSecret api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}

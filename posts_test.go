@@ -10,16 +10,21 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/rmrfslashbin/thumbtack/internal/constants"
+	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
 func TestPostsAdd(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsAddResp := `{"result_code":"done"}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.PostsAdd {
+		api, err := config.GetAPI("PostsAdd")
+		if err != nil {
+			t.Fatalf("failed to get PostsAdd api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -71,12 +76,17 @@ func TestPostsAdd(t *testing.T) {
 }
 
 func TestPostsAll(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsAllResp := `[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"},
 	{"href":"https:\/\/rmrfslashbin.io","description":"my homepage","extended":"This is the descr of the bookmark","meta":"36b8648620031b4805d6caa45a5e6a1d","hash":"ed59c2e5b3eb284b178ffae1dcfffc08","time":"2023-03-19T22:53:10Z","shared":"no","toread":"no","tags":"homepage personal test example"}]`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.PostsAll {
+		api, err := config.GetAPI("PostsAll")
+		if err != nil {
+			t.Fatalf("failed to get PostsAll api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -127,11 +137,16 @@ func TestPostsAll(t *testing.T) {
 }
 
 func TestPostsDates(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsDatesResp := `{"user":"test","tag":"","dates":{"2023-04-20":1,"2023-04-21":4}}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.PostsDates {
+		api, err := config.GetAPI("PostsDates")
+		if err != nil {
+			t.Fatalf("failed to get PostsDates api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -169,11 +184,16 @@ func TestPostsDates(t *testing.T) {
 }
 
 func TestPostsDelete(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsDeleteResp := `{"result_code":"done"}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.PostsDelete {
+		api, err := config.GetAPI("PostsDelete")
+		if err != nil {
+			t.Fatalf("failed to get PostsDelete api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -211,11 +231,16 @@ func TestPostsDelete(t *testing.T) {
 }
 
 func TestPostsGet(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsGetResp := `{"date":"2023-03-20T16:30:35Z","user":"test","posts":[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"}]}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.PostsGet {
+		api, err := config.GetAPI("PostsGet")
+		if err != nil {
+			t.Fatalf("failed to get PostsGet api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -261,11 +286,16 @@ func TestPostsGet(t *testing.T) {
 }
 
 func TestPostsRecent(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsRecentResp := `{"date":"2023-03-20T16:30:35Z","user":"test","posts":[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"}]}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.PostsRecent {
+		api, err := config.GetAPI("PostsRecent")
+		if err != nil {
+			t.Fatalf("failed to get PostsRecent api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -305,11 +335,16 @@ func TestPostsRecent(t *testing.T) {
 }
 
 func TestPostsSuggest(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsSuggestResp := `[{"popular":["Unread","pinboard","bookmarks"]},{"recommended":["Unread","pinboard","bookmarks"]}]`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.PostsSuggest {
+		api, err := config.GetAPI("PostsSuggest")
+		if err != nil {
+			t.Fatalf("failed to get PostsSuggest api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -347,11 +382,16 @@ func TestPostsSuggest(t *testing.T) {
 }
 
 func TestPostsUpdate(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	postsUpdateResp := `{"update_time":"2023-03-20T16:44:37Z"}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.PostsUpdate {
+		api, err := config.GetAPI("PostsUpdate")
+		if err != nil {
+			t.Fatalf("failed to get PostsUpdate api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}

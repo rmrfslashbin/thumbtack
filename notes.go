@@ -3,8 +3,6 @@ package thumbtack
 import (
 	"encoding/json"
 	"net/url"
-
-	"github.com/rmrfslashbin/thumbtack/internal/constants"
 )
 
 // NoteById returns a single note
@@ -16,7 +14,11 @@ func (c *Client) NotesById(id string) (*Note, error) {
 	v.Set("auth_token", *c.token)
 
 	// Call the endpoint
-	path := constants.NotesById + "/" + id
+	notesById, err := c.configs.GetAPI("NotesById")
+	if err != nil {
+		return nil, err
+	}
+	path := notesById + "/" + id
 	body, err := c.callEndpoint(path, v.Encode())
 	if err != nil {
 		c.log.Error().
@@ -48,12 +50,16 @@ func (c *Client) NotesList() (*Notes, error) {
 	v.Set("auth_token", *c.token)
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.NotesList, v.Encode())
+	notesList, err := c.configs.GetAPI("NotesList")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(notesList, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::NotesList").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.NotesList).
+			Str("path", notesList).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err

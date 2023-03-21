@@ -7,7 +7,7 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/rmrfslashbin/thumbtack/cmd/thumbtack/clictx"
 	"github.com/rmrfslashbin/thumbtack/cmd/thumbtack/root"
-	"github.com/rmrfslashbin/thumbtack/internal/constants"
+	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
@@ -61,11 +61,12 @@ func main() {
 		}
 	}
 
+	config := configs.New()
 	var userAgent string
 	if cli.UserAgent != nil {
 		userAgent = *cli.UserAgent
 	} else {
-		userAgent = constants.Useragent
+		userAgent = config.GetUserAgent()
 	}
 
 	// Call the Run() method of the selected parsed command.

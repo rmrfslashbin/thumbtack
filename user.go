@@ -3,8 +3,6 @@ package thumbtack
 import (
 	"encoding/json"
 	"net/url"
-
-	"github.com/rmrfslashbin/thumbtack/internal/constants"
 )
 
 // UserSecret Returns the user's secret RSS key.
@@ -16,12 +14,16 @@ func (c *Client) UserSecret() (*Result, error) {
 	v.Set("auth_token", *c.token)
 
 	// Call the endpoint
-	body, err := c.callEndpoint(constants.UserSecret, v.Encode())
+	userSecret, err := c.configs.GetAPI("UserSecret")
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.callEndpoint(userSecret, v.Encode())
 	if err != nil {
 		c.log.Error().
 			Str("function", "thumbtack::UserSecret").
 			Str("endpoint", c.endpoint.String()).
-			Str("path", constants.UserSecret).
+			Str("path", userSecret).
 			Str("query", v.Encode()).
 			Msg("error calling endpoint")
 		return nil, err

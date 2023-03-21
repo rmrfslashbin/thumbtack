@@ -9,16 +9,21 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/rmrfslashbin/thumbtack/internal/constants"
+	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
 func TestTagsDelete(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsDeleteResp := `{"result":"done"}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.TagsDelete {
+		api, err := config.GetAPI("TagsDelete")
+		if err != nil {
+			t.Fatalf("failed to get TagsDelete api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -76,11 +81,16 @@ func TestTagsDeleteBadAPICall(t *testing.T) {
 }
 
 func TestTagsDeleteNotDone(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsDeleteResp := `{"result":"somethingelse"}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.TagsDelete {
+		api, err := config.GetAPI("TagsDelete")
+		if err != nil {
+			t.Fatalf("failed to get TagsDelete api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -109,11 +119,16 @@ func TestTagsDeleteNotDone(t *testing.T) {
 }
 
 func TestTagsDeleteWithBadData(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsDeleteResp := "garbage"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.TagsDelete {
+		api, err := config.GetAPI("TagsDelete")
+		if err != nil {
+			t.Fatalf("failed to get TagsDelete api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -142,11 +157,16 @@ func TestTagsDeleteWithBadData(t *testing.T) {
 }
 
 func TestTagsGet(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsGetResp := `{"api":1,"books":1,"custom":1,"haproxy":2,"homepage":1,"logging":1}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.TagsGet {
+		api, err := config.GetAPI("TagsGet")
+		if err != nil {
+			t.Fatalf("failed to get TagsGet api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -202,12 +222,17 @@ func TestTagsGetBadAPICall(t *testing.T) {
 	}
 }
 
-func TestTagsWithBadData(t *testing.T) {
+func TestTagsGetWithBadData(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsGetResp := "garbage"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.TagsGet {
+		api, err := config.GetAPI("TagsGet")
+		if err != nil {
+			t.Fatalf("failed to get TagsGet api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -236,11 +261,16 @@ func TestTagsWithBadData(t *testing.T) {
 }
 
 func TestTagsRename(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsRenameResp := `{"result":"done"}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.TagsRename {
+		api, err := config.GetAPI("TagsRename")
+		if err != nil {
+			t.Fatalf("failed to get TagsRename api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -367,11 +397,16 @@ func TestTagsRenameBadAPICall(t *testing.T) {
 }
 
 func TestTagsRenameWithBadData(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsRenameResp := "garbage"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.TagsRename {
+		api, err := config.GetAPI("TagsRename")
+		if err != nil {
+			t.Fatalf("failed to get TagsRename api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -402,11 +437,16 @@ func TestTagsRenameWithBadData(t *testing.T) {
 }
 
 func TestTagsRenameResultNotDone(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	tagsRenameResp := `{"result":"something else"}`
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.TagsRename {
+		api, err := config.GetAPI("TagsRename")
+		if err != nil {
+			t.Fatalf("failed to get TagsRename api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}

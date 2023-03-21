@@ -8,17 +8,24 @@ import (
 	"os"
 	"testing"
 
-	"github.com/rmrfslashbin/thumbtack/internal/constants"
+	"github.com/rmrfslashbin/thumbtack/internal/configs"
 	"github.com/rs/zerolog"
 )
 
 func TestNotesById(t *testing.T) {
+	config := configs.New()
+
 	token := "test:abc123"
 	useragent := "test/1.0"
 	notesByIdResp := `{"id":"xxxx67e342662e6c239c","title":"Test Note 01","created_at":"2023-03-19 14:35:16","updated_at":"2023-03-19 14:35:16","length":40,"text":"This is my test note to see how it works","hash":"xxxx910a03859fd9e80a"}`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.NotesById+"/xxxx67e342662e6c239c" {
+		api, err := config.GetAPI("NotesById")
+		if err != nil {
+			t.Fatalf("failed to get NotesById api: %v", err)
+		}
+
+		if r.URL.Path != api+"/xxxx67e342662e6c239c" {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -75,12 +82,17 @@ func TestNotesByIdBadAPICall(t *testing.T) {
 }
 
 func TestNotesByIdWithBadData(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	notesByIdResp := `garbage`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.NotesById+"/xxxx67e342662e6c239c" {
+		api, err := config.GetAPI("NotesById")
+		if err != nil {
+			t.Fatalf("failed to get NotesById api: %v", err)
+		}
+		if r.URL.Path != api+"/xxxx67e342662e6c239c" {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -108,12 +120,17 @@ func TestNotesByIdWithBadData(t *testing.T) {
 }
 
 func TestNotesList(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	notesListResp := `{"count":1,"notes":[{"0":"xxxx67e342662e6c239c","id":"xxxx67e342662e6c239c","1":"xxxx910a03859fd9e80a","hash":"xxxx910a03859fd9e80a","2":"Test Note 01","title":"Test Note 01","3":40,"length":40,"4":"2023-03-19 14:35:16","created_at":"2023-03-19 14:35:16","5":"2023-03-19 14:35:16","updated_at":"2023-03-19 14:35:16"}]}`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.NotesList {
+		api, err := config.GetAPI("NotesList")
+		if err != nil {
+			t.Fatalf("failed to get NotesList api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
@@ -171,12 +188,17 @@ func TestNotesListBadAPICall(t *testing.T) {
 }
 
 func TestNotesListWithBadData(t *testing.T) {
+	config := configs.New()
 	token := "test:abc123"
 	useragent := "test/1.0"
 	notesListResp := `garbage`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != constants.NotesList {
+		api, err := config.GetAPI("NotesList")
+		if err != nil {
+			t.Fatalf("failed to get NotesList api: %v", err)
+		}
+		if r.URL.Path != api {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
