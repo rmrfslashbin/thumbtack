@@ -53,10 +53,8 @@ type Bookmark struct {
 // UnmarshalJSON is a custom unmarshaler for the Bookmark struct
 func (bookmark *Bookmark) UnmarshalJSON(b []byte) error {
 	var data map[string]interface{}
-	err := json.Unmarshal(b, &data)
-	if err != nil {
-		return err
-	}
+	json.Unmarshal(b, &data)
+
 	for key, value := range data {
 		switch key {
 		case "href":
@@ -129,10 +127,8 @@ type Note struct {
 // UnmarshalJSON is a custom unmarshaler for the Note struct
 func (note *Note) UnmarshalJSON(b []byte) error {
 	var data map[string]interface{}
-	err := json.Unmarshal(b, &data)
-	if err != nil {
-		return err
-	}
+	json.Unmarshal(b, &data)
+
 	for key, value := range data {
 		switch key {
 		case "id":
@@ -258,10 +254,7 @@ type Suggestions struct {
 func (suggestions *Suggestions) UnmarshalJSON(b []byte) error {
 	var data []map[string][]string
 
-	err := json.Unmarshal(b, &data)
-	if err != nil {
-		return err
-	}
+	json.Unmarshal(b, &data)
 
 	for _, value := range data {
 		for key, value := range value {
@@ -295,10 +288,8 @@ type Tags struct {
 func (tags *Tags) UnmarshalJSON(b []byte) error {
 	var data map[string]int
 
-	err := json.Unmarshal(b, &data)
-	if err != nil {
-		return err
-	}
+	json.Unmarshal(b, &data)
+
 	tags.Tags = make(map[string]int, len(data))
 	tags.Count = len(data)
 	for key, value := range data {

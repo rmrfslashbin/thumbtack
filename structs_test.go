@@ -7,7 +7,7 @@ import (
 
 func TestBookmarkStructJsonUnmarshelFail(t *testing.T) {
 	bookmark := Bookmark{}
-	if err := json.Unmarshal([]byte(`{garbage}`), &bookmark); err == nil {
+	if err := json.Unmarshal([]byte("garbage"), &bookmark); err == nil {
 		t.Error("Expected error, got nil")
 	}
 }
