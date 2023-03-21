@@ -91,6 +91,36 @@ func TestErrMissingInputFieldNoInput(t *testing.T) {
 	}
 }
 
+func TestErrMissingInputFieldWithField(t *testing.T) {
+	err := ErrMissingInputField{Field: "testField"}
+	errorOutput := err.Error()
+	expectedOutput := "missing input: testField"
+	if errorOutput != expectedOutput {
+		t.Errorf("Error() = %v, want %v", errorOutput, expectedOutput)
+	}
+}
+
+func TestErrNoToken(t *testing.T) {
+	err := ErrNoToken{
+		Err: errors.New("Testing subError"),
+		Msg: "Testing ErrNoToken",
+	}
+	errorOutput := err.Error()
+	expectedOutput := "Testing ErrNoToken: Testing subError"
+	if errorOutput != expectedOutput {
+		t.Errorf("Error() = %v, want %v", errorOutput, expectedOutput)
+	}
+}
+
+func TestErrNoTokenNoInput(t *testing.T) {
+	err := ErrNoToken{}
+	errorOutput := err.Error()
+	expectedOutput := "no provided. use WithToken()"
+	if errorOutput != expectedOutput {
+		t.Errorf("Error() = %v, want %v", errorOutput, expectedOutput)
+	}
+}
+
 func TestErrUnexpectedResponse(t *testing.T) {
 	err := ErrUnexpectedResponse{
 		Err: errors.New("Testing subError"),
@@ -107,6 +137,15 @@ func TestErrUnexpectedResponseNoInput(t *testing.T) {
 	err := ErrUnexpectedResponse{}
 	errorOutput := err.Error()
 	expectedOutput := "unexpected response"
+	if errorOutput != expectedOutput {
+		t.Errorf("Error() = %v, want %v", errorOutput, expectedOutput)
+	}
+}
+
+func TestErrUnexpectedResponseWithResultCode(t *testing.T) {
+	err := ErrUnexpectedResponse{ResultCode: "testCode"}
+	errorOutput := err.Error()
+	expectedOutput := "unexpected response: testCode"
 	if errorOutput != expectedOutput {
 		t.Errorf("Error() = %v, want %v", errorOutput, expectedOutput)
 	}
