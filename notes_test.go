@@ -53,6 +53,60 @@ func TestNotesById(t *testing.T) {
 	}
 }
 
+func TestNotesByIdBadAPICall(t *testing.T) {
+	useragent := "test/1.0"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithEndpoint(&url.URL{}),
+		WithToken("foo"),
+		WithLogger(&log),
+		WithUserAgent(useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	if _, err := client.NotesById("xxxx67e342662e6c239c"); err == nil {
+		t.Fatalf("expected error to not be nil")
+	}
+}
+
+func TestNotesByIdWithBadData(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	notesByIdResp := `garbage`
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != constants.NotesById+"/xxxx67e342662e6c239c" {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		fmt.Fprint(w, notesByIdResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(token),
+		WithLogger(&log),
+		WithUserAgent(useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	if _, err := client.NotesById("xxxx67e342662e6c239c"); err == nil {
+		t.Fatalf("expected error to not be nil")
+	}
+}
+
 func TestNotesList(t *testing.T) {
 	token := "test:abc123"
 	useragent := "test/1.0"
@@ -92,5 +146,60 @@ func TestNotesList(t *testing.T) {
 	}
 	if notesList.Count != 1 {
 		t.Errorf("expected Count to be 1, got %d", notesList.Count)
+	}
+}
+
+func TestNotesListBadAPICall(t *testing.T) {
+	useragent := "test/1.0"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithEndpoint(&url.URL{}),
+		WithToken("foo"),
+		WithLogger(&log),
+		WithUserAgent(useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	if _, err := client.NotesList(); err == nil {
+		t.Fatalf("expected error to not be nil")
+	}
+}
+
+func TestNotesListWithBadData(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	notesListResp := `garbage`
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != constants.NotesList {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, notesListResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(token),
+		WithLogger(&log),
+		WithUserAgent(useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	if _, err := client.NotesList(); err == nil {
+		t.Fatalf("expected error to not be nil")
 	}
 }
