@@ -1,6 +1,8 @@
 package thumbtack
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"testing"
@@ -84,5 +86,36 @@ func TestThumbtackNoUseragent(t *testing.T) {
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+}
+
+func TestThumbtackBadHttpReply(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(token),
+		WithLogger(&log),
+		WithUserAgent(useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.UserSecret()
+	if err == nil {
+		t.Fatalf("expected error to not be nil")
+	}
+	if v, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected error to be ErrBadStatusCode, got %v", v)
 	}
 }
