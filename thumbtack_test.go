@@ -20,9 +20,9 @@ func TestThumbtackNoLogger(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		//WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -42,9 +42,9 @@ func TestThumbtackNoToken(t *testing.T) {
 
 	_, err := New(
 		WithEndpoint(url),
-		//WithToken(token),
+		//WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if _, ok := err.(*ErrNoToken); !ok {
 		t.Fatalf("expected error to be ErrNoToken, got %v", err)
@@ -61,9 +61,9 @@ func TestThumbtackNoEndpoint(t *testing.T) {
 
 	_, err := New(
 		WithEndpoint(nil),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -80,9 +80,28 @@ func TestThumbtackNoUseragent(t *testing.T) {
 
 	_, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(""),
+		WithUserAgent(nil),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+}
+
+func TestThumbtackNillUseragent(t *testing.T) {
+	token := "test:abc123"
+	//useragent := "test/1.0"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse("https://example.com")
+
+	_, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(nil),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -103,9 +122,33 @@ func TestThumbtackBadHttpReply(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.UserSecret()
+	if err == nil {
+		t.Fatalf("expected error to not be nil")
+	}
+	if v, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected error to be ErrBadStatusCode, got %v", v)
+	}
+}
+
+func TestThumbtackWithConfig(t *testing.T) {
+	token := "test:abc123"
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config := NewConfig()
+
+	client, err := New(
+		WithToken(&token),
+		WithLogger(&log),
+		WithConfigs(config),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)

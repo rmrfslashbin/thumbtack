@@ -38,9 +38,9 @@ func TestNotesById(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -61,15 +61,16 @@ func TestNotesById(t *testing.T) {
 
 func TestNotesByIdBadAPICall(t *testing.T) {
 	useragent := "test/1.0"
+	token := "foo"
 
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.PanicLevel)
 
 	client, err := New(
 		WithEndpoint(&url.URL{}),
-		WithToken("foo"),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -105,9 +106,9 @@ func TestNotesByIdWithBadData(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -144,9 +145,9 @@ func TestNotesList(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -167,15 +168,16 @@ func TestNotesList(t *testing.T) {
 
 func TestNotesListBadAPICall(t *testing.T) {
 	useragent := "test/1.0"
+	token := "foo"
 
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.PanicLevel)
 
 	client, err := New(
 		WithEndpoint(&url.URL{}),
-		WithToken("foo"),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -212,9 +214,9 @@ func TestNotesListWithBadData(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)

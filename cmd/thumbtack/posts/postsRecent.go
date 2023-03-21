@@ -27,9 +27,9 @@ func (cmd *PostsRecentCmd) Run(ctx *clictx.Context) error {
 	// Create thumbtack client
 	client, err := thumbtack.New(
 		thumbtack.WithEndpoint(ctx.Endpoint),
-		thumbtack.WithToken(*ctx.Token),
+		thumbtack.WithToken(ctx.Token),
 		thumbtack.WithLogger(ctx.Log),
-		thumbtack.WithUserAgent(*ctx.UserAgent),
+		thumbtack.WithUserAgent(ctx.UserAgent),
 	)
 	if err != nil {
 		ctx.Log.Error().

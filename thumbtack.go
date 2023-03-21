@@ -109,16 +109,16 @@ func WithLogger(log *zerolog.Logger) Option {
 }
 
 // WithToken sets the token for the controller
-func WithToken(token string) Option {
+func WithToken(token *string) Option {
 	return func(c *Client) {
-		c.token = &token
+		c.token = token
 	}
 }
 
 // WithUserAgent sets the userAgent for the controller
-func WithUserAgent(userAgent string) Option {
+func WithUserAgent(userAgent *string) Option {
 	return func(c *Client) {
-		c.userAgent = &userAgent
+		c.userAgent = userAgent
 	}
 }
 

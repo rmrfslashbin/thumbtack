@@ -36,9 +36,9 @@ func TestUserSecret(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -58,15 +58,16 @@ func TestUserSecret(t *testing.T) {
 
 func TestUsersBadAPICall(t *testing.T) {
 	useragent := "test/1.0"
+	token := "foo"
 
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.PanicLevel)
 
 	client, err := New(
 		WithEndpoint(&url.URL{}),
-		WithToken("foo"),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -102,9 +103,9 @@ func TestUserSecretBadResults(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)

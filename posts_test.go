@@ -38,9 +38,9 @@ func TestPostsAdd(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -100,9 +100,9 @@ func TestPostsAll(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -160,9 +160,9 @@ func TestPostsDates(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -207,9 +207,9 @@ func TestPostsDelete(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -254,9 +254,9 @@ func TestPostsGet(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -309,9 +309,9 @@ func TestPostsRecent(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -358,9 +358,9 @@ func TestPostsSuggest(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -405,9 +405,9 @@ func TestPostsUpdate(t *testing.T) {
 
 	client, err := New(
 		WithEndpoint(url),
-		WithToken(token),
+		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(useragent),
+		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
