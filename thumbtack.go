@@ -56,7 +56,7 @@ func New(opts ...Option) (*Client, error) {
 	// set up logger if not provided
 	if client.log == nil {
 		log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		zerolog.SetGlobalLevel(zerolog.PanicLevel)
 		log.Debug().Msg("No logger provided, using default logger")
 		client.log = &log
 	}
