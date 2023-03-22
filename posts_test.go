@@ -1372,7 +1372,6 @@ func TestPostsRecentBadHttpStatus(t *testing.T) {
 	useragent := "test/1.0"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
 	}))
 	defer ts.Close()
 
@@ -1391,8 +1390,8 @@ func TestPostsRecentBadHttpStatus(t *testing.T) {
 	}
 
 	_, err = client.PostsRecent(nil)
-	if err == nil {
-		t.Fatalf("expected error, got nil")
+	if _, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected ErrBadStatusCode, got %v", err)
 	}
 }
 
@@ -1726,4 +1725,96 @@ func TestPostsUpdate(t *testing.T) {
 	if postsUpdate.UpdateTime != expectedUpdateTime {
 		t.Errorf("expected update time to be '%s', got '%s'", expectedUpdateTime, postsUpdate.UpdateTime)
 	}
+}
+
+func TestPostsUpdateBadApiCall(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config.SetAPI("PostsUpdate", "")
+
+	client, err := New(
+		WithConfigs(config),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsUpdate()
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected ErrApiNotSet, got %v", err)
+	}
+}
+
+func TestPostsUpdateBadHttpStatus(t *testing.T) {
+	token := "test:abc123"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsUpdate()
+	if _, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected ErrBadStatusCode, got %v", err)
+	}
+
+}
+
+func TestPostsUpdateResponseData(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsUpdateResp := "garbage"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsUpdate")
+		if err != nil {
+			t.Fatalf("failed to get PostsUpdate api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsUpdateResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsUpdate()
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+
 }
