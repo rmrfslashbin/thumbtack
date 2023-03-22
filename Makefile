@@ -4,7 +4,7 @@
 default: tidy build
 
 # Build the project
-build:
+build: test
 	@echo "Building..."
 	@if [ ! -d "./bin" ]; then mkdir bin; fi
 	@go build -o bin/thumbtack cmd/thumbtack/main.go

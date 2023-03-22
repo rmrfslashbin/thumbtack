@@ -35,7 +35,10 @@ func (c *Client) NotesById(id string) (*Note, error) {
 	err = json.Unmarshal(*body, note)
 	if err != nil {
 		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	return note, nil

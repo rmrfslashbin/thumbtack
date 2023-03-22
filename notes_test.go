@@ -11,6 +11,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// TestNotesById tests the NotesById method
 func TestNotesById(t *testing.T) {
 	config := NewConfig()
 
@@ -54,48 +55,25 @@ func TestNotesById(t *testing.T) {
 	if notesById == nil {
 		t.Fatalf("expected notesById to not be nil")
 	}
+
 	if notesById.Id != "xxxx67e342662e6c239c" {
 		t.Errorf("expected Id to be 'xxxx67e342662e6c239c', got '%s'", notesById.Id)
 	}
 }
 
+// NotesByIdBadAPICall tests the NotesById method with a bad API call
 func TestNotesByIdBadAPICall(t *testing.T) {
-	useragent := "test/1.0"
-	token := "foo"
-
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(zerolog.PanicLevel)
-
-	client, err := New(
-		WithEndpoint(&url.URL{}),
-		WithToken(&token),
-		WithLogger(&log),
-		WithUserAgent(&useragent),
-	)
-	if err != nil {
-		t.Fatalf("failed to create thumbtask instance: %v", err)
-	}
-
-	if _, err := client.NotesById("xxxx67e342662e6c239c"); err == nil {
-		t.Fatalf("expected error to not be nil")
-	}
-}
-
-func TestNotesByIdBadConfig(t *testing.T) {
-	useragent := "test/1.0"
 	token := "foo"
 	config := NewConfig()
-	config.SetAPI("NotesById", "")
 
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config.SetAPI("NotesById", "")
 
 	client, err := New(
 		WithConfigs(config),
-		WithEndpoint(&url.URL{}),
 		WithToken(&token),
 		WithLogger(&log),
-		WithUserAgent(&useragent),
 	)
 	if err != nil {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
@@ -108,7 +86,8 @@ func TestNotesByIdBadConfig(t *testing.T) {
 	}
 }
 
-func TestNotesByIdWithBadData(t *testing.T) {
+// TestNotesByIdBadHttpResponse tests the NotesById method with bad data
+func TestNotesByIdBadHttpResponse(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"

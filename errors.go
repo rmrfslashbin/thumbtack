@@ -120,3 +120,21 @@ func (e *ErrUnexpectedResponse) Error() string {
 	}
 	return e.Msg
 }
+
+// ErrUnmarshalResponse is returned when the response cannot be unmarshalled
+type ErrUnmarshalResponse struct {
+	Body []byte
+	Err  error
+	Msg  string
+}
+
+// Error returns the error message
+func (e *ErrUnmarshalResponse) Error() string {
+	if e.Msg == "" {
+		e.Msg = "failed to unmarshal response"
+	}
+	if e.Err != nil {
+		e.Msg += ": " + e.Err.Error()
+	}
+	return e.Msg
+}
