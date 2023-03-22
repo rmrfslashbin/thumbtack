@@ -75,14 +75,14 @@ func TestPostsAdd(t *testing.T) {
 	}
 }
 
-// TestPostsAddBadApiEndpoint tests the PostsAdd method with a bad API endpoint
-func TestPostsAddBadApiEndpoint(t *testing.T) {
+// TestPostsAddBadAPICall tests the PostsAdd method with a bad API endpoint
+func TestPostsAddBadAPICall(t *testing.T) {
 	token := "test:abc123"
 	config := NewConfig()
-	config.SetAPI("PostsAdd", "")
 
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config.SetAPI("PostsAdd", "")
 
 	client, err := New(
 		WithLogger(&log),
@@ -98,7 +98,7 @@ func TestPostsAddBadApiEndpoint(t *testing.T) {
 	addTitle := "Example Title"
 	addTrue := true
 	addTime := time.Now()
-	if _, err := client.PostsAdd(&PostsAddInput{
+	_, err = client.PostsAdd(&PostsAddInput{
 		Url:         &addUrl,
 		Title:       &addTitle,
 		Description: &addDescr,
@@ -107,14 +107,14 @@ func TestPostsAddBadApiEndpoint(t *testing.T) {
 		Tags:        []string{"test", "example"},
 		Timestamp:   &addTime,
 		ToRead:      &addTrue,
-	}); err == nil {
-		t.Fatalf("expected error, got nil")
+	})
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected ErrApiNotSet, got %T", err)
 	}
-
 }
 
 // TestPostsAddBadData tests the PostsAdd method with bad data
-func TestPostsAddBadData(t *testing.T) {
+func TestPostsAddBadHttpResponse(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
@@ -152,7 +152,7 @@ func TestPostsAddBadData(t *testing.T) {
 	addTitle := "Example Title"
 	addTrue := true
 	addTime := time.Now()
-	if _, err := client.PostsAdd(&PostsAddInput{
+	_, err = client.PostsAdd(&PostsAddInput{
 		Url:         &addUrl,
 		Title:       &addTitle,
 		Description: &addDescr,
@@ -161,8 +161,51 @@ func TestPostsAddBadData(t *testing.T) {
 		Tags:        []string{"test", "example"},
 		Timestamp:   &addTime,
 		ToRead:      &addTrue,
-	}); err == nil {
-		t.Fatalf("expected error, got nil")
+	})
+	if _, ok := err.(*ErrUnmarshalResponse); !ok {
+		t.Fatalf("expected ErrUnmarshalResponse, got %T", err)
+	}
+}
+
+func TestPostsAddBadHttpStatus(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	addUrl := "https://example.com"
+	addDescr := "Example Description"
+	addTitle := "Example Title"
+	addTrue := true
+	addTime := time.Now()
+	_, err = client.PostsAdd(&PostsAddInput{
+		Url:         &addUrl,
+		Title:       &addTitle,
+		Description: &addDescr,
+		Replace:     &addTrue,
+		Shared:      &addTrue,
+		Tags:        []string{"test", "example"},
+		Timestamp:   &addTime,
+		ToRead:      &addTrue,
+	})
+	if _, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected ErrBadStatusCode, got %T", err)
 	}
 }
 

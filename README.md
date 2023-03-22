@@ -1,7 +1,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/rmrfslashbin/thumbtack.svg)](https://pkg.go.dev/github.com/rmrfslashbin/thumbtack)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rmrfslashbin/thumbtack)](https://goreportcard.com/report/github.com/rmrfslashbin/thumbtack)
 [![codecov](https://codecov.io/gh/rmrfslashbin/thumbtack/branch/main/graph/badge.svg?token=63I217ZCRL)](https://codecov.io/gh/rmrfslashbin/thumbtack)
-[![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/rmrfslashbin/thumbtack/master/LICENSE)
+[![license](https://img.shields.io/github/license/rmrfslashbin/thumbtack)](https://raw.githubusercontent.com/rmrfslashbin/thumbtack/master/LICENSE)
 # thumbtack
 Thumbtack is a Go client for https://pinboard.in.
 
@@ -39,7 +39,12 @@ This client supports the following API endpoints (https://api.pinboard.in/v1/):
 ## CLI
 This repo provides a CLI as a reference implementation of the client. The CLI is not intended to be a full-featured client, but rather a simple example of how to use the client. Most of the CLI's functionality is implemented in the `cmd` package.
 
-### Building
+### Building the CLI
+- This client requires Go 1.20 or higher.
+- Clone this repo `git clone https://github.com/rmrfslashbin/thumbtack.git && cd thumbtack`
+- Run `make build` to build the CLI
+- Run `make install` to install the CLI to your `$GOPATH/bin` directory.
+
 To build the CLI, run `make build`. This will build the CLI and place it in the `bin` directory.
 
 ## Pinboard Authentication and User Tokens
@@ -85,3 +90,32 @@ From the Pinboard API documentation (https://pinboard.in/api/v2/overview)
 
 ## Logging
 This client uses https://github.com/rs/zerolog for logging. If desired, Zerolog output can be effectively silenced by setting the log level to `zerolog.SetGlobalLevel(zerolog.PanicLevel)`.
+
+## Quick Start
+```go
+log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+zerolog.SetGlobalLevel(zerolog.InfoLevel)
+token := "username:token"
+userAgent := "MyAwesomeApp/1.0"
+
+// Create thumbtack client
+client, err := thumbtack.New(
+    thumbtack.WithToken(&token),
+    thumbtack.WithLogger(&log),
+    thumbtack.WithUserAgent(&userAgent),
+)
+if err != nil {
+    ctx.Log.Error().Msg("Failed to create client")
+    return err
+}
+
+// Get bookmarks with params
+bookmarks, err := client.PostsAll(nil)
+if err != nil {
+    ctx.Log.Error().
+        Str("cmd", "posts all").
+        Msg("Failed to get bookmarks")
+    return err
+}
+spew.Dump(bookmarks)
+```
