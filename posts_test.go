@@ -1044,6 +1044,7 @@ func TestPostsDeleteErrorResult(t *testing.T) {
 	}
 }
 
+// TestPostsGet tests the PostsGet method
 func TestPostsGet(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -1078,11 +1079,11 @@ func TestPostsGet(t *testing.T) {
 	}
 
 	timestamp, _ := time.Parse(time.RFC3339, "2023-03-20T16:30:35Z")
-	getTrue := true
+	getFalse := false
 	getUrl := "https://example.com"
 	postsGet, err := client.PostsGet(&PostsGetInput{
 		Date: &timestamp,
-		Meta: &getTrue,
+		Meta: &getFalse,
 		Tags: []string{"test", "example"},
 		URL:  &getUrl,
 	})
@@ -1096,6 +1097,196 @@ func TestPostsGet(t *testing.T) {
 	}
 	if postsGet.User != "test" {
 		t.Errorf("expected user 'test', got '%s'", postsGet.User)
+	}
+}
+
+// TestPostsGetBadApiCall tests the PostsGet method with a bad api call
+func TestPostsGetBadApiCall(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config.SetAPI("PostsGet", "")
+
+	client, err := New(
+		WithConfigs(config),
+		WithToken(&token),
+		WithLogger(&log),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsGet(nil)
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+// TestPostsGetBadHttpStatus tests the PostsGet method with a bad http status
+func TestPostsGetBadHttpStatus(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsGet(nil)
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+// TestPostsGetBadResponseData tests the PostsGet method with bad response data
+func TestPostsGetBadResponseData(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsGetResp := "garbage"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsGet")
+		if err != nil {
+			t.Fatalf("failed to get PostsGet api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsGetResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsGet(nil)
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+
+}
+
+// TestPostsGetInputNil tests the PostsGet method with nil input
+func TestPostsGetInputNil(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsGetResp := `{"date":"2023-03-20T16:30:35Z","user":"test","posts":[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"}]}`
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsGet")
+		if err != nil {
+			t.Fatalf("failed to get PostsGet api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsGetResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	postsGet, err := client.PostsGet(nil)
+	if err != nil {
+		spew.Dump(postsGet)
+		t.Fatalf("failed to get posts: %v", err)
+	}
+
+	if postsGet == nil {
+		t.Fatalf("expected postsGet to not be nil")
+	}
+	if postsGet.User != "test" {
+		t.Errorf("expected user 'test', got '%s'", postsGet.User)
+	}
+}
+
+// TestPostsGetInputTagsGte3 tests the PostsGet method with input tags gte 3
+func TestPostsGetInputTagsGte3(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsGetResp := `{"date":"2023-03-20T16:30:35Z","user":"test","posts":[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"}]}`
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsGet")
+		if err != nil {
+			t.Fatalf("failed to get PostsGet api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsGetResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	timestamp, _ := time.Parse(time.RFC3339, "2023-03-20T16:30:35Z")
+	getFalse := false
+	getUrl := "https://example.com"
+	_, err = client.PostsGet(&PostsGetInput{
+		Date: &timestamp,
+		Meta: &getFalse,
+		Tags: []string{"test", "example", "foo", "bar"},
+		URL:  &getUrl,
+	})
+	if _, ok := err.(*ErrInvalidInput); !ok {
+		t.Fatalf("expected ErrInvalidInput, got %v", err)
 	}
 }
 
