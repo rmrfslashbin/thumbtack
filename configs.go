@@ -60,7 +60,7 @@ func (e *ErrUnknownApi) Error() string {
 // New returns a new Configs struct
 func NewConfig() *Configs {
 	useragent := "github.com/rmrfslashbin/thumbtack@v"
-	version := "1.0.1"
+	version := "1.1.0"
 
 	// Set up the default configs
 	return &Configs{

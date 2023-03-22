@@ -83,6 +83,7 @@ func TestUsersBadAPICall(t *testing.T) {
 	}
 }
 
+// TestUserSecretBadHttpResponse tests the UserSecret method with a bad http response
 func TestUserSecretBadHttpResponse(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -122,6 +123,7 @@ func TestUserSecretBadHttpResponse(t *testing.T) {
 	}
 }
 
+// TestUserSecretBadHttpStatus tests the UserSecret method with a bad http status
 func TestUserSecretBadHttpStatus(t *testing.T) {
 	token := "test:abc123"
 	useragent := "test/1.0"
