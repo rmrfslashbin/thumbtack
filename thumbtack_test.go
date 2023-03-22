@@ -162,29 +162,3 @@ func TestThumbtackWithConfig(t *testing.T) {
 		t.Fatalf("expected error to be ErrBadStatusCode, got %v", v)
 	}
 }
-
-func TestThumbtackBadHttpMethod(t *testing.T) {
-	useragent := "test/1.0"
-	token := "foo"
-	config := NewConfig()
-
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(zerolog.PanicLevel)
-	config.SetMethod("FOO")
-
-	client, err := New(
-		WithConfigs(config),
-		WithEndpoint(&url.URL{}),
-		WithToken(&token),
-		WithLogger(&log),
-		WithUserAgent(&useragent),
-	)
-	if err != nil {
-		t.Fatalf("failed to create thumbtask instance: %v", err)
-	}
-
-	_, err = client.UserSecret()
-	if _, ok := err.(*url.Error); !ok {
-		t.Fatalf("expected error to be of type url.Error, got %T", err)
-	}
-}

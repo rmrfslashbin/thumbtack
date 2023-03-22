@@ -34,7 +34,7 @@ func (c *Client) NotesById(id string) (*Note, error) {
 	note := &Note{}
 	err = json.Unmarshal(*body, note)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
+		c.log.Error().Msg("error unmarshalling response")
 		return nil, &ErrUnmarshalResponse{
 			Body: *body,
 			Err:  err,
@@ -72,7 +72,7 @@ func (c *Client) NotesList() (*Notes, error) {
 	notes := &Notes{}
 	err = json.Unmarshal(*body, notes)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
+		c.log.Error().Msg("error unmarshalling response")
 		return nil, &ErrUnmarshalResponse{
 			Body: *body,
 			Err:  err,

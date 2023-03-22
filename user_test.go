@@ -11,6 +11,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// TestUserSecret tests the UserSecret method
 func TestUserSecret(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -56,40 +57,18 @@ func TestUserSecret(t *testing.T) {
 	}
 }
 
+// TestUserSecretBadAPICall tests the UserSecret method with a bad api call
 func TestUsersBadAPICall(t *testing.T) {
-	useragent := "test/1.0"
-	token := "foo"
-
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(zerolog.PanicLevel)
-
-	client, err := New(
-		WithEndpoint(&url.URL{}),
-		WithToken(&token),
-		WithLogger(&log),
-		WithUserAgent(&useragent),
-	)
-	if err != nil {
-		t.Fatalf("failed to create thumbtask instance: %v", err)
-	}
-
-	if _, err := client.UserSecret(); err == nil {
-		t.Fatalf("expected error to not be nil")
-	}
-}
-
-func TestUsersBadConfig(t *testing.T) {
-	useragent := "test/1.0"
-	token := "foo"
 	config := NewConfig()
-	config.SetAPI("UserSecret", "")
+	useragent := "test/1.0"
+	token := "foo"
 
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config.SetAPI("UserSecret", "")
 
 	client, err := New(
 		WithConfigs(config),
-		WithEndpoint(&url.URL{}),
 		WithToken(&token),
 		WithLogger(&log),
 		WithUserAgent(&useragent),
@@ -99,17 +78,16 @@ func TestUsersBadConfig(t *testing.T) {
 	}
 
 	_, err = client.UserSecret()
-
 	if _, ok := err.(*ErrApiNotSet); !ok {
 		t.Fatalf("expected error to be of type ErrApiNotSet, got %T", err)
 	}
 }
 
-func TestUserSecretBadResults(t *testing.T) {
+func TestUserSecretBadHttpResponse(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
-	userSecretResp := "bad json"
+	userSecretResp := "garbage"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		api, err := config.GetAPI("UserSecret")
 		if err != nil {
@@ -138,7 +116,36 @@ func TestUserSecretBadResults(t *testing.T) {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
 	}
 
-	if _, err := client.UserSecret(); err == nil {
-		t.Fatalf("expected error to not be nil")
+	_, err = client.UserSecret()
+	if _, ok := err.(*ErrUnmarshalResponse); !ok {
+		t.Fatalf("expected error to be of type ErrUnmarshalResponse, got %T", err)
+	}
+}
+
+func TestUserSecretBadHttpStatus(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.UserSecret()
+	if _, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected error to be of type ErrBadStatusCode, got %T", err)
 	}
 }

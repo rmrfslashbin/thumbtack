@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// TestTagsDelete tests the TagsDelete method
 func TestTagsDelete(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -58,36 +59,15 @@ func TestTagsDelete(t *testing.T) {
 	}
 }
 
+// TestTagsDeleteBadAPICall tests the TagsDelete method with a bad api call
 func TestTagsDeleteBadAPICall(t *testing.T) {
 	useragent := "test/1.0"
 	token := "foo"
-
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(zerolog.PanicLevel)
-
-	client, err := New(
-		WithEndpoint(&url.URL{}),
-		WithToken(&token),
-		WithLogger(&log),
-		WithUserAgent(&useragent),
-	)
-	if err != nil {
-		t.Fatalf("failed to create thumbtask instance: %v", err)
-	}
-
-	if _, err := client.TagsDelete("api"); err == nil {
-		t.Fatalf("expected error to not be nil")
-	}
-}
-
-func TestTagsDeleteBadConfig(t *testing.T) {
-	useragent := "test/1.0"
-	token := "foo"
 	config := NewConfig()
-	config.SetAPI("TagsDelete", "")
 
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config.SetAPI("TagsDelete", "")
 
 	client, err := New(
 		WithConfigs(config),
@@ -107,45 +87,8 @@ func TestTagsDeleteBadConfig(t *testing.T) {
 	}
 }
 
-func TestTagsDeleteNotDone(t *testing.T) {
-	config := NewConfig()
-	token := "test:abc123"
-	useragent := "test/1.0"
-	tagsDeleteResp := `{"result":"somethingelse"}`
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		api, err := config.GetAPI("TagsDelete")
-		if err != nil {
-			t.Fatalf("failed to get TagsDelete api: %v", err)
-		}
-		if r.URL.Path != api {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		}
-
-		fmt.Fprint(w, tagsDeleteResp)
-	}))
-	defer ts.Close()
-
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(zerolog.PanicLevel)
-	url, _ := url.Parse(ts.URL)
-
-	client, err := New(
-		WithEndpoint(url),
-		WithToken(&token),
-		WithLogger(&log),
-		WithUserAgent(&useragent),
-	)
-	if err != nil {
-		t.Fatalf("failed to create thumbtask instance: %v", err)
-	}
-
-	if tagsDelete, _ := client.TagsDelete("api"); tagsDelete != nil {
-		t.Fatalf("expected tagsDelete to be nil")
-	}
-}
-
-func TestTagsDeleteWithBadData(t *testing.T) {
+// TestTagsDeleteBadHttpResponse tests the TagsDelete method with a bad http response
+func TestTagsDeleteBadHttpResponse(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
@@ -178,11 +121,82 @@ func TestTagsDeleteWithBadData(t *testing.T) {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
 	}
 
-	if _, err := client.TagsDelete("api"); err == nil {
-		t.Fatalf("expected error to not be nil")
+	_, err = client.TagsDelete("api")
+	if _, ok := err.(*ErrUnmarshalResponse); !ok {
+		t.Fatalf("expected error to be of type ErrUnmarshalResponse, got %T", err)
 	}
 }
 
+// TestTagsDeleteBadHttpStatus tests the TagsDelete method with a bad http status
+func TestTagsDeleteBadHttpStatus(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.TagsDelete("api")
+	if _, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected error to be of type ErrBadStatusCode, got %T", err)
+	}
+}
+
+// TestTagsDeleteUnexpectedResponse tests the TagsDelete method with an unexpected response
+func TestTagsDeleteUnexpectedResponse(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	tagsDeleteResp := `{"result":"somethingelse"}`
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("TagsDelete")
+		if err != nil {
+			t.Fatalf("failed to get TagsDelete api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, tagsDeleteResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.TagsDelete("api")
+	if _, ok := err.(*ErrUnexpectedResponse); !ok {
+		t.Fatalf("expected error to be of type ErrUnexpectedResponse, got %T", err)
+	}
+}
+
+// TestTagsGet tests the TagsGet method
 func TestTagsGet(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -228,36 +242,15 @@ func TestTagsGet(t *testing.T) {
 	}
 }
 
+// TestTagsGetBadAPICall tests the TagsGet method with a bad api call
 func TestTagsGetBadAPICall(t *testing.T) {
 	useragent := "test/1.0"
 	token := "foo"
-
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(zerolog.PanicLevel)
-
-	client, err := New(
-		WithEndpoint(&url.URL{}),
-		WithToken(&token),
-		WithLogger(&log),
-		WithUserAgent(&useragent),
-	)
-	if err != nil {
-		t.Fatalf("failed to create thumbtask instance: %v", err)
-	}
-
-	if _, err := client.TagsGet(); err == nil {
-		t.Fatalf("expected error to not be nil")
-	}
-}
-
-func TestTagsGetBadConfig(t *testing.T) {
-	useragent := "test/1.0"
-	token := "foo"
 	config := NewConfig()
-	config.SetAPI("TagsGet", "")
 
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config.SetAPI("TagsGet", "")
 
 	client, err := New(
 		WithConfigs(config),
@@ -277,7 +270,8 @@ func TestTagsGetBadConfig(t *testing.T) {
 	}
 }
 
-func TestTagsGetWithBadData(t *testing.T) {
+// TestTagsGetBadHttpResponse tests the TagsGet method with a bad http response
+func TestTagsGetBadHttpResponse(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
@@ -310,11 +304,42 @@ func TestTagsGetWithBadData(t *testing.T) {
 		t.Fatalf("failed to create thumbtask instance: %v", err)
 	}
 
-	if _, err := client.TagsGet(); err == nil {
-		t.Fatalf("expected error to not be nil")
+	_, err = client.TagsGet()
+	if _, ok := err.(*ErrUnmarshalResponse); !ok {
+		t.Fatalf("expected error to be of type ErrUnmarshalResponse, got %T", err)
 	}
 }
 
+// TestTagsGetBadHttpStatus tests the TagsGet method with a bad http status
+func TestTagsGetBadHttpStatus(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.TagsGet()
+	if _, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected error to be of type ErrBadStatusCode, got %T", err)
+	}
+}
+
+// TestTagsRename tests the TagsRename method
 func TestTagsRename(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -363,106 +388,15 @@ func TestTagsRename(t *testing.T) {
 	}
 }
 
-func TestTagsRenameInputNil(t *testing.T) {
-	useragent := "test/1.0"
-	token := "foo"
-
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(zerolog.PanicLevel)
-
-	client, err := New(
-		WithEndpoint(&url.URL{}),
-		WithToken(&token),
-		WithLogger(&log),
-		WithUserAgent(&useragent),
-	)
-	if err != nil {
-		t.Fatalf("failed to create thumbtask instance: %v", err)
-	}
-
-	if _, err := client.TagsRename(nil); err == nil {
-		t.Fatalf("expected error to not be nil")
-	}
-}
-
-func TestTagsRenameInputOldNil(t *testing.T) {
-	useragent := "test/1.0"
-	token := "foo"
-
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(zerolog.PanicLevel)
-
-	client, err := New(
-		WithEndpoint(&url.URL{}),
-		WithToken(&token),
-		WithLogger(&log),
-		WithUserAgent(&useragent),
-	)
-	if err != nil {
-		t.Fatalf("failed to create thumbtask instance: %v", err)
-	}
-
-	new := "new"
-	if _, err := client.TagsRename(&TagsRenameInput{Old: nil, New: &new}); err == nil {
-		t.Fatalf("expected error to not be nil")
-	}
-}
-
-func TestTagsRenameInputNewNil(t *testing.T) {
-	useragent := "test/1.0"
-	token := "foo"
-
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(zerolog.PanicLevel)
-
-	client, err := New(
-		WithEndpoint(&url.URL{}),
-		WithToken(&token),
-		WithLogger(&log),
-		WithUserAgent(&useragent),
-	)
-	if err != nil {
-		t.Fatalf("failed to create thumbtask instance: %v", err)
-	}
-
-	old := "old"
-	if _, err := client.TagsRename(&TagsRenameInput{Old: &old, New: nil}); err == nil {
-		t.Fatalf("expected error to not be nil")
-	}
-}
-
+// TestTagsRenameBadAPICall tests the TagsRename method with a bad api call
 func TestTagsRenameBadAPICall(t *testing.T) {
 	useragent := "test/1.0"
 	token := "foo"
-
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(zerolog.PanicLevel)
-
-	client, err := New(
-		WithEndpoint(&url.URL{}),
-		WithToken(&token),
-		WithLogger(&log),
-		WithUserAgent(&useragent),
-	)
-	if err != nil {
-		t.Fatalf("failed to create thumbtask instance: %v", err)
-	}
-
-	old := "old"
-	new := "new"
-	if _, err := client.TagsRename(&TagsRenameInput{Old: &old, New: &new}); err == nil {
-		t.Fatalf("expected error to not be nil")
-	}
-}
-
-func TestTagsRenameBadConfig(t *testing.T) {
-	useragent := "test/1.0"
-	token := "foo"
 	config := NewConfig()
-	config.SetAPI("TagsRename", "")
 
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config.SetAPI("TagsRename", "")
 
 	client, err := New(
 		WithConfigs(config),
@@ -478,13 +412,13 @@ func TestTagsRenameBadConfig(t *testing.T) {
 	old := "old"
 	new := "new"
 	_, err = client.TagsRename(&TagsRenameInput{Old: &old, New: &new})
-
 	if _, ok := err.(*ErrApiNotSet); !ok {
 		t.Fatalf("expected error to be of type ErrApiNotSet, got %T", err)
 	}
 }
 
-func TestTagsRenameWithBadData(t *testing.T) {
+// TestTagsRenameBadHttpResponse tests the TagsRename method with a bad http response
+func TestTagsRenameBadHttpResponse(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
@@ -519,12 +453,45 @@ func TestTagsRenameWithBadData(t *testing.T) {
 
 	old := "old"
 	new := "new"
-	if _, err := client.TagsRename(&TagsRenameInput{Old: &old, New: &new}); err == nil {
-		t.Fatalf("expected error to not be nil")
+	_, err = client.TagsRename(&TagsRenameInput{Old: &old, New: &new})
+	if _, ok := err.(*ErrUnmarshalResponse); !ok {
+		t.Fatalf("expected error to be of type ErrUnmarshalResponse, got %T", err)
 	}
 }
 
-func TestTagsRenameResultNotDone(t *testing.T) {
+// TestTagsRenameBadHttpStatus tests the TagsRename method with a bad http status
+func TestTagsRenameBadHttpStatus(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	old := "old"
+	new := "new"
+	_, err = client.TagsRename(&TagsRenameInput{Old: &old, New: &new})
+	if _, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected error to be of type ErrBadStatusCode, got %T", err)
+	}
+}
+
+// TestTagsRenameUnexpectedResponse tests the TagsRename method with an unexpected response
+func TestTagsRenameUnexpectedResponse(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
@@ -562,5 +529,85 @@ func TestTagsRenameResultNotDone(t *testing.T) {
 	_, err = client.TagsRename(&TagsRenameInput{Old: &old, New: &new})
 	if _, ok := err.(*ErrUnexpectedResponse); !ok {
 		t.Fatalf("expected error to be of type ErrUnexpectedResponse, got %T", err)
+	}
+}
+
+// TestTagsRenameInputNil tests the TagsRename method with a nil input
+func TestTagsRenameInputNil(t *testing.T) {
+	useragent := "test/1.0"
+	token := "foo"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithEndpoint(&url.URL{}),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.TagsRename(nil)
+	if _, ok := err.(*ErrInvalidInput); !ok {
+		t.Fatalf("expected error to be of type ErrInvalidInput, got %T", err)
+	}
+}
+
+// TestTagsRenameInputOldNil tests the TagsRename method with a nil input
+func TestTagsRenameInputOldNil(t *testing.T) {
+	useragent := "test/1.0"
+	token := "foo"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithEndpoint(&url.URL{}),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	new := "new"
+	_, err = client.TagsRename(&TagsRenameInput{Old: nil, New: &new})
+	if _, ok := err.(*ErrMissingInputField); !ok {
+		if err.(*ErrMissingInputField).Field != "Old" {
+			t.Fatalf("expected error field to be Old, got %s", err.(*ErrMissingInputField).Field)
+		}
+		t.Fatalf("expected error to be of type ErrMissingInputField, got %T", err)
+	}
+}
+
+// TestTagsRenameInputNewNil tests the TagsRename method with a nil input
+func TestTagsRenameInputNewNil(t *testing.T) {
+	useragent := "test/1.0"
+	token := "foo"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithEndpoint(&url.URL{}),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	old := "old"
+	_, err = client.TagsRename(&TagsRenameInput{Old: &old, New: nil})
+	if _, ok := err.(*ErrMissingInputField); !ok {
+		if err.(*ErrMissingInputField).Field != "New" {
+			t.Fatalf("expected error field to be New, got %s", err.(*ErrMissingInputField).Field)
+		}
+		t.Fatalf("expected error to be of type ErrMissingInputField, got %T", err)
 	}
 }

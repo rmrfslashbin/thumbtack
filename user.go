@@ -33,8 +33,11 @@ func (c *Client) UserSecret() (*Result, error) {
 	secret := &Result{}
 	err = json.Unmarshal(*body, secret)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	return secret, nil

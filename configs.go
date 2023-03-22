@@ -10,9 +10,6 @@ type Configs struct {
 	// endpoint is the root url for the api.
 	endpoint string
 
-	// method is the http method for the client.
-	method string
-
 	// useragent is the user agent string for the client.
 	useragent string
 
@@ -84,7 +81,6 @@ func NewConfig() *Configs {
 			"TagsRename":   "/tags/rename",
 		},
 		endpoint:  "https://api.pinboard.in/v1",
-		method:    "GET",
 		useragent: useragent + version,
 		version:   version,
 	}
@@ -109,11 +105,6 @@ func (c *Configs) GetAPI(api string) (string, error) {
 // GetEndpoint returns the endpoint.
 func (c *Configs) GetEndpoint() string {
 	return c.endpoint
-}
-
-// GetMethod returns the http method.
-func (c *Configs) GetMethod() string {
-	return c.method
 }
 
 // GetUserAgent returns the user agent string.
@@ -142,11 +133,6 @@ func (c *Configs) SetAPI(api string, value string) error {
 // SetEndpoint sets the endpoint.
 func (c *Configs) SetEndpoint(endpoint string) {
 	c.endpoint = endpoint
-}
-
-// SetMethod sets the http method.
-func (c *Configs) SetMethod(method string) {
-	c.method = method
 }
 
 // SetUserAgent sets the user agent string.

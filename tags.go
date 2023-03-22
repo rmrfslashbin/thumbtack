@@ -34,8 +34,11 @@ func (c *Client) TagsDelete(tag string) (*Result, error) {
 	result := &Result{}
 	err = json.Unmarshal(*body, result)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	if result.Result != "done" {
@@ -73,8 +76,11 @@ func (c *Client) TagsGet() (*Tags, error) {
 	tags := &Tags{}
 	err = json.Unmarshal(*body, tags)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	return tags, nil
@@ -131,8 +137,11 @@ func (c *Client) TagsRename(input *TagsRenameInput) (*Result, error) {
 	result := &Result{}
 	err = json.Unmarshal(*body, result)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	if result.Result != "done" {

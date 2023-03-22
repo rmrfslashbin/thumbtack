@@ -135,8 +135,11 @@ func (c *Client) PostsAdd(input *PostsAddInput) (*Result, error) {
 	result := &Result{}
 	err = json.Unmarshal(*body, result)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	if result.ResultCode != "done" {
@@ -231,8 +234,11 @@ func (c *Client) PostsAll(input *PostsAllInput) (*[]Bookmark, error) {
 	bookmarks := &[]Bookmark{}
 	err = json.Unmarshal(*body, bookmarks)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	return bookmarks, nil
@@ -274,8 +280,11 @@ func (c *Client) PostsDates(tags []string) (*Dates, error) {
 	dates := &Dates{}
 	err = json.Unmarshal(*body, dates)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	return dates, nil
@@ -310,8 +319,11 @@ func (c *Client) PostsDelete(urlToDelete string) (*Result, error) {
 	result := &Result{}
 	err = json.Unmarshal(*body, result)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	if result.ResultCode != "done" {
@@ -393,8 +405,11 @@ func (c *Client) PostsGet(input *PostsGetInput) (*Posts, error) {
 	bookmarks := &Posts{}
 	err = json.Unmarshal(*body, bookmarks)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	return bookmarks, nil
@@ -458,8 +473,11 @@ func (c *Client) PostsRecent(input *PostsRecentInput) (*Posts, error) {
 	bookmarks := &Posts{}
 	err = json.Unmarshal(*body, bookmarks)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	return bookmarks, nil
@@ -494,8 +512,11 @@ func (c *Client) PostsSuggest(urlToSuggest string) (*Suggestions, error) {
 	suggestions := &Suggestions{}
 	err = json.Unmarshal(*body, suggestions)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	return suggestions, nil
@@ -530,8 +551,11 @@ func (c *Client) PostsUpdate() (*UpdateTime, error) {
 	updateTime := &UpdateTime{}
 	err = json.Unmarshal(*body, updateTime)
 	if err != nil {
-		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		c.log.Error().Msg("error unmarshalling response")
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	return updateTime, nil

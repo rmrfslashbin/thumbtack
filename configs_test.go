@@ -60,15 +60,6 @@ func TestErrUnknownApiNoMsg(t *testing.T) {
 	}
 }
 
-func TestMethod(t *testing.T) {
-	config := NewConfig()
-	method := "POST"
-	config.SetMethod(method)
-	if config.GetMethod() != method {
-		t.Errorf("expected method to be '%s', got '%s'", method, config.GetMethod())
-	}
-}
-
 func TestSetUnknownApi(t *testing.T) {
 	config := NewConfig()
 	if err := config.SetAPI("foo", "bar"); err == nil {
