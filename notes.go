@@ -73,7 +73,10 @@ func (c *Client) NotesList() (*Notes, error) {
 	err = json.Unmarshal(*body, notes)
 	if err != nil {
 		c.log.Error().Msg("error unmashalling response")
-		return nil, err
+		return nil, &ErrUnmarshalResponse{
+			Body: *body,
+			Err:  err,
+		}
 	}
 
 	return notes, nil
