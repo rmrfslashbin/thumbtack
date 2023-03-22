@@ -72,10 +72,7 @@ func New(opts ...Option) (*Client, error) {
 
 	// set up endpoint
 	if client.endpoint == nil {
-		endpoint, err := url.Parse(client.configs.GetEndpoint())
-		if err != nil {
-			return nil, &ErrBadEndpoint{}
-		}
+		endpoint, _ := url.Parse(client.configs.GetEndpoint())
 		client.endpoint = endpoint
 	}
 
@@ -130,7 +127,7 @@ func (c *Client) callEndpoint(path string, query string) (*[]byte, error) {
 		Msg("calling endpoint")
 
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(c.configs.method, url, nil)
 	if err != nil {
 		c.log.Error().Msg("failed to create request")
 		return nil, err

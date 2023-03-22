@@ -30,3 +30,8 @@ updatemods:
 test:
 	@echo "Testing..."
 	@go test -covermode=atomic ./...
+
+coverage:
+	@echo "Testing..."
+	@go test -covermode=atomic -coverprofile=coverage.out ./...
+	@go tool cover -html=coverage.out

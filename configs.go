@@ -10,6 +10,9 @@ type Configs struct {
 	// endpoint is the root url for the api.
 	endpoint string
 
+	// method is the http method for the client.
+	method string
+
 	// useragent is the user agent string for the client.
 	useragent string
 
@@ -81,10 +84,15 @@ func NewConfig() *Configs {
 			"TagsRename":   "/tags/rename",
 		},
 		endpoint:  "https://api.pinboard.in/v1",
+		method:    "GET",
 		useragent: useragent + version,
 		version:   version,
 	}
 }
+
+//
+// Get methods
+//
 
 // GetAPI returns the api endpoint or an error if the api is not known.
 func (c *Configs) GetAPI(api string) (string, error) {
@@ -98,14 +106,19 @@ func (c *Configs) GetAPI(api string) (string, error) {
 	}
 }
 
-// GetUserAgent returns the user agent string.
-func (c *Configs) GetUserAgent() string {
-	return c.useragent
-}
-
 // GetEndpoint returns the endpoint.
 func (c *Configs) GetEndpoint() string {
 	return c.endpoint
+}
+
+// GetMethod returns the http method.
+func (c *Configs) GetMethod() string {
+	return c.method
+}
+
+// GetUserAgent returns the user agent string.
+func (c *Configs) GetUserAgent() string {
+	return c.useragent
 }
 
 // GetVersion returns the version.
@@ -113,9 +126,27 @@ func (c *Configs) GetVersion() string {
 	return c.version
 }
 
+//
+// Get methods
+//
+
+// SetAPI sets the api endpoint or returns an error if the api is not known.
+func (c *Configs) SetAPI(api string, value string) error {
+	if _, ok := c.apis[api]; !ok {
+		return &ErrUnknownApi{Api: api}
+	}
+	c.apis[api] = value
+	return nil
+}
+
 // SetEndpoint sets the endpoint.
 func (c *Configs) SetEndpoint(endpoint string) {
 	c.endpoint = endpoint
+}
+
+// SetMethod sets the http method.
+func (c *Configs) SetMethod(method string) {
+	c.method = method
 }
 
 // SetUserAgent sets the user agent string.
@@ -126,13 +157,4 @@ func (c *Configs) SetUserAgent(useragent string) {
 // SetVersion sets the version.
 func (c *Configs) SetVersion(version string) {
 	c.version = version
-}
-
-// SetAPI sets the api endpoint or returns an error if the api is not known.
-func (c *Configs) SetAPI(api string, value string) error {
-	if _, ok := c.apis[api]; !ok {
-		return &ErrUnknownApi{Api: api}
-	}
-	c.apis[api] = value
-	return nil
 }
