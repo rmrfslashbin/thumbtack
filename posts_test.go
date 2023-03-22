@@ -1618,6 +1618,68 @@ func TestPostsSuggest(t *testing.T) {
 	}
 }
 
+func TestPostsSuggestBadApiCall(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config.SetAPI("PostsSuggest", "")
+
+	client, err := New(
+		WithConfigs(config),
+		WithToken(&token),
+		WithLogger(&log),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsSuggest("https://example.com")
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected ErrApiNotSet, got %v", err)
+	}
+}
+
+func TestPostsSuggestBadResponseData(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsSuggestResp := "garbage"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsSuggest")
+		if err != nil {
+			t.Fatalf("failed to get PostsSuggest api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsSuggestResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsSuggest("https://example.com")
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
 func TestPostsUpdate(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
