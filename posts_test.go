@@ -74,6 +74,111 @@ func TestPostsAdd(t *testing.T) {
 	}
 }
 
+func TestPostsAddErrorResult(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsAddResp := `{"result_code":"error"}`
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsAdd")
+		if err != nil {
+			t.Fatalf("failed to get PostsAdd api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsAddResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	addUrl := "https://example.com"
+	addDescr := "Example Description"
+	addTitle := "Example Title"
+	addTrue := true
+	addTime := time.Now()
+	_, err = client.PostsAdd(&PostsAddInput{
+		Url:         &addUrl,
+		Title:       &addTitle,
+		Description: &addDescr,
+		Replace:     &addTrue,
+		Shared:      &addTrue,
+		Tags:        []string{"test", "example"},
+		Timestamp:   &addTime,
+		ToRead:      &addTrue,
+	})
+	if _, ok := err.(*ErrUnexpectedResponse); !ok {
+		t.Fatalf("expected error to be of type ErrUnexpectedResponse, got %T", err)
+	}
+}
+
+func TestPostsAddBadData(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsAddResp := "garbage"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsAdd")
+		if err != nil {
+			t.Fatalf("failed to get PostsAdd api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsAddResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	addUrl := "https://example.com"
+	addDescr := "Example Description"
+	addTitle := "Example Title"
+	addTrue := true
+	addTime := time.Now()
+	if _, err := client.PostsAdd(&PostsAddInput{
+		Url:         &addUrl,
+		Title:       &addTitle,
+		Description: &addDescr,
+		Replace:     &addTrue,
+		Shared:      &addTrue,
+		Tags:        []string{"test", "example"},
+		Timestamp:   &addTime,
+		ToRead:      &addTrue,
+	}); err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
 func TestPostsAddInputNil(t *testing.T) {
 
 	token := "test:abc123"
