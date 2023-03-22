@@ -1640,6 +1640,34 @@ func TestPostsSuggestBadApiCall(t *testing.T) {
 	}
 }
 
+func TestPostsSuggestBadHttpResponse(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsSuggest("https://example.com")
+	if _, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected ErrBadStatusCode, got %v", err)
+	}
+}
+
 func TestPostsSuggestBadResponseData(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
