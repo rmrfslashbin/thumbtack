@@ -862,6 +862,7 @@ func TestPostsDatesBadResponseData(t *testing.T) {
 	}
 }
 
+// TestPostsDates tests the PostsDates method
 func TestPostsDelete(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -906,6 +907,140 @@ func TestPostsDelete(t *testing.T) {
 	}
 	if postsDelete.ResultCode != "done" {
 		t.Errorf("expected ResultCode to be 'done', got '%s'", postsDelete.ResultCode)
+	}
+}
+
+// TestPostsDeleteBadApiCall tests the PostsDelete method with a bad api call
+func TestPostsDeleteBadApiCall(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	config.SetAPI("PostsDelete", "")
+
+	client, err := New(
+		WithConfigs(config),
+		WithToken(&token),
+		WithLogger(&log),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsDelete("https://example.com")
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+// TestPostsDeleteBadHttpResponse tests the PostsDelete method with a bad http response
+func TestPostsDeleteBadHttpResponse(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsDelete("https://example.com")
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+// TestPostsDeleteBadReplyData tests the PostsDelete method with bad reply data
+func TestPostsDeleteBadReplyData(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsDeleteResp := "garbage"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsDelete")
+		if err != nil {
+			t.Fatalf("failed to get PostsDelete api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsDeleteResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsDelete("https://example.com")
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+// TestPostsDeleteBadApiCall tests the PostsDelete method with a bad api call
+func TestPostsDeleteErrorResult(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsDeleteResp := `{"result_code":"something else"}`
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsDelete")
+		if err != nil {
+			t.Fatalf("failed to get PostsDelete api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsDeleteResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsDelete("https://example.com")
+	if _, ok := err.(*ErrUnexpectedResponse); !ok {
+		t.Fatalf("expected ErrorResult, got %T", err)
 	}
 }
 
