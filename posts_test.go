@@ -492,6 +492,7 @@ func TestPostsAllBadApiCall(t *testing.T) {
 	config.SetAPI("PostsAll", "")
 
 	client, err := New(
+		WithConfigs(config),
 		WithLogger(&log),
 		WithToken(&token),
 	)
@@ -698,6 +699,7 @@ func TestPostsAllInputTagsGte3(t *testing.T) {
 	}
 }
 
+// TestPostsDates tests the PostsDates method
 func TestPostsDates(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -742,6 +744,121 @@ func TestPostsDates(t *testing.T) {
 	}
 	if postsDates.User != "test" {
 		t.Errorf("expected User to be 'test', got '%s'", postsDates.User)
+	}
+}
+
+// TestPostsDatesInputTagsGte3 tests the PostsDates method with input tags greater than 3
+func TestPostsDatesInputTagsGte3(t *testing.T) {
+	token := "test:abc123"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	client, err := New(
+		WithToken(&token),
+		WithLogger(&log),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsDates([]string{"test", "example", "foo", "bar"})
+	if _, ok := err.(*ErrInvalidInput); !ok {
+		t.Fatalf("expected ErrInvalidInput, got '%v'", err)
+	}
+
+}
+
+// TestPostsDatesBadApiCall tests the PostsDates method with a bad api call
+func TestPostsDatesBadApiCall(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+
+	config.SetAPI("PostsDates", "")
+
+	client, err := New(
+		WithConfigs(config),
+		WithToken(&token),
+		WithLogger(&log),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsDates([]string{"test", "example"})
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+// TestPostsDatesBadHttpResponse tests the PostsDates method with a bad http response
+func TestPostsDatesBadHttpResponse(t *testing.T) {
+	token := "test:abc123"
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsDates([]string{"test", "example"})
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+// TestPostsDatesBadResponseData tests the PostsDates method with bad response data
+func TestPostsDatesBadResponseData(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsDatesResp := "gargage"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsDates")
+		if err != nil {
+			t.Fatalf("failed to get PostsDates api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsDatesResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsDates([]string{"test", "example"})
+	if err == nil {
+		t.Fatalf("expected error, got nil")
 	}
 }
 
