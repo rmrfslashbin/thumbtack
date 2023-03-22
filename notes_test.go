@@ -125,6 +125,35 @@ func TestNotesByIdBadHttpResponse(t *testing.T) {
 	}
 }
 
+func TestNotesByIdBadHttpStatus(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.NotesById("xxxx67e342662e6c239c")
+	if _, ok := err.(*ErrBadStatusCode); !ok {
+		t.Fatalf("expected error to be of type ErrBadStatusCode, got %T", err)
+	}
+}
+
 func TestNotesList(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"

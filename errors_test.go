@@ -150,3 +150,33 @@ func TestErrUnexpectedResponseWithResultCode(t *testing.T) {
 		t.Errorf("Error() = %v, want %v", errorOutput, expectedOutput)
 	}
 }
+
+func TestErrUnmarshalResponse(t *testing.T) {
+	err := ErrUnmarshalResponse{
+		Err: errors.New("Testing subError"),
+		Msg: "Testing ErrUnmarshalResponse",
+	}
+	errorOutput := err.Error()
+	expectedOutput := "Testing ErrUnmarshalResponse: Testing subError"
+	if errorOutput != expectedOutput {
+		t.Errorf("Error() = %v, want %v", errorOutput, expectedOutput)
+	}
+}
+
+func TestErrUnmarshalResponseNoInput(t *testing.T) {
+	err := ErrUnmarshalResponse{}
+	errorOutput := err.Error()
+	expectedOutput := "failed to unmarshal response"
+	if errorOutput != expectedOutput {
+		t.Errorf("Error() = %v, want %v", errorOutput, expectedOutput)
+	}
+}
+
+func TestErrUnmarshalResponseWithMsg(t *testing.T) {
+	err := ErrUnmarshalResponse{Msg: "testMsg"}
+	errorOutput := err.Error()
+	expectedOutput := "testMsg"
+	if errorOutput != expectedOutput {
+		t.Errorf("Error() = %v, want %v", errorOutput, expectedOutput)
+	}
+}
