@@ -318,8 +318,8 @@ func TestPostsAddInputTagsGet100(t *testing.T) {
 
 }
 
-// TestPostsAddInputTimestampGte10 tests the PostsAdd method with a timestamp greater than 10 minutes
-func TestPostsAddInputTimestampGte10(t *testing.T) {
+// TestPostsAddInputTimestampgt10 tests the PostsAdd method with a timestamp greater than 10 minutes
+func TestPostsAddInputTimestampgt10(t *testing.T) {
 
 	token := "test:abc123"
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
@@ -676,8 +676,8 @@ func TestPostsAllInputMetaFalse(t *testing.T) {
 	}
 }
 
-// TestPostsAllInputTagsGte3 tests the PostsAll method with input tags greater than 3
-func TestPostsAllInputTagsGte3(t *testing.T) {
+// TestPostsAllInputTagsgt3 tests the PostsAll method with input tags greater than 3
+func TestPostsAllInputTagsgt3(t *testing.T) {
 	token := "test:abc123"
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.PanicLevel)
@@ -747,8 +747,8 @@ func TestPostsDates(t *testing.T) {
 	}
 }
 
-// TestPostsDatesInputTagsGte3 tests the PostsDates method with input tags greater than 3
-func TestPostsDatesInputTagsGte3(t *testing.T) {
+// TestPostsDatesInputTagsgt3 tests the PostsDates method with input tags greater than 3
+func TestPostsDatesInputTagsgt3(t *testing.T) {
 	token := "test:abc123"
 
 	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
@@ -1242,8 +1242,8 @@ func TestPostsGetInputNil(t *testing.T) {
 	}
 }
 
-// TestPostsGetInputTagsGte3 tests the PostsGet method with input tags gte 3
-func TestPostsGetInputTagsGte3(t *testing.T) {
+// TestPostsGetInputTagsgt3 tests the PostsGet method with input tags gt 3
+func TestPostsGetInputTagsgt3(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
 	useragent := "test/1.0"
@@ -1290,6 +1290,7 @@ func TestPostsGetInputTagsGte3(t *testing.T) {
 	}
 }
 
+// TestPostsRecent tests the PostsRecent method
 func TestPostsRecent(t *testing.T) {
 	config := NewConfig()
 	token := "test:abc123"
@@ -1336,6 +1337,237 @@ func TestPostsRecent(t *testing.T) {
 	}
 	if postsRecent.User != "test" {
 		t.Errorf("expected user 'test', got '%s'", postsRecent.User)
+	}
+}
+
+// TestPostsRecentBadApiCall tests the PostsRecent method with a bad api call
+func TestPostsRecentBadApiCall(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	config.SetAPI("PostsRecent", "")
+
+	client, err := New(
+		WithConfigs(config),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsRecent(nil)
+	if _, ok := err.(*ErrApiNotSet); !ok {
+		t.Fatalf("expected ErrApiNotSet, got %v", err)
+	}
+}
+
+// TestPostsRecentBadHttpStatus tests the PostsRecent method with a bad http status
+func TestPostsRecentBadHttpStatus(t *testing.T) {
+	token := "test:abc123"
+	useragent := "test/1.0"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsRecent(nil)
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+// TestPostsRecentBadResonseData tests the PostsRecent method with bad response data
+func TestPostsRecentBadResonseData(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsRecentResp := "garbage"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsRecent")
+		if err != nil {
+			t.Fatalf("failed to get PostsRecent api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsRecentResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	_, err = client.PostsRecent(nil)
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+}
+
+// TestPostsRecentInputNil tests the PostsRecent method with nil input
+func TestPostsRecentInputNil(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsRecentResp := `{"date":"2023-03-20T16:30:35Z","user":"test","posts":[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"}]}`
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsRecent")
+		if err != nil {
+			t.Fatalf("failed to get PostsRecent api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsRecentResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	postsRecent, err := client.PostsRecent(nil)
+	if err != nil {
+		spew.Dump(postsRecent)
+		t.Fatalf("failed to get recent posts: %v", err)
+	}
+
+	if postsRecent == nil {
+		t.Fatalf("expected postsRecent to not be nil")
+	}
+	if postsRecent.User != "test" {
+		t.Errorf("expected user 'test', got '%s'", postsRecent.User)
+	}
+}
+
+// TestPostsRecentInputCountGt100 tests the PostsRecent method with input count > 100
+func TestPostsRecentInputCountGt100(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsRecentResp := `{"date":"2023-03-20T16:30:35Z","user":"test","posts":[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"}]}`
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsRecent")
+		if err != nil {
+			t.Fatalf("failed to get PostsRecent api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsRecentResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	count := 200
+	tags := []string{"example"}
+	_, err = client.PostsRecent(&PostsRecentInput{Count: &count, Tags: tags})
+	if _, ok := err.(*ErrInvalidInput); !ok {
+		t.Fatalf("expected ErrInvalidInput, got %v", err)
+	}
+}
+
+// TestPostsRecentInputTagsGt3 tests the PostsRecent method with input tags > 3
+func TestPostsRecentInputTagsGt3(t *testing.T) {
+	config := NewConfig()
+	token := "test:abc123"
+	useragent := "test/1.0"
+	postsRecentResp := `{"date":"2023-03-20T16:30:35Z","user":"test","posts":[{"href":"https:\/\/example.com","description":"example post","extended":"this is the test post\/bookmark","meta":"258002234f7274ed91cd4c50ff2f65e7","hash":"c984d06aafbecf6bc55569f964148ea3","time":"2023-03-20T16:30:35Z","shared":"no","toread":"no","tags":"test example"}]}`
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		api, err := config.GetAPI("PostsRecent")
+		if err != nil {
+			t.Fatalf("failed to get PostsRecent api: %v", err)
+		}
+		if r.URL.Path != api {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		fmt.Fprint(w, postsRecentResp)
+	}))
+	defer ts.Close()
+
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	url, _ := url.Parse(ts.URL)
+
+	client, err := New(
+		WithEndpoint(url),
+		WithToken(&token),
+		WithLogger(&log),
+		WithUserAgent(&useragent),
+	)
+	if err != nil {
+		t.Fatalf("failed to create thumbtask instance: %v", err)
+	}
+
+	count := 2
+	tags := make([]string, 4)
+	for i := 0; i < 4; i++ {
+		tags[i] = "example"
+	}
+	_, err = client.PostsRecent(&PostsRecentInput{Count: &count, Tags: tags})
+	if _, ok := err.(*ErrInvalidInput); !ok {
+		t.Fatalf("expected ErrInvalidInput, got %v", err)
 	}
 }
 
