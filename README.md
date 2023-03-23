@@ -43,9 +43,7 @@ This repo provides a CLI as a reference implementation of the client. The CLI is
 - This client requires Go 1.20 or higher.
 - Clone this repo `git clone https://github.com/rmrfslashbin/thumbtack.git && cd thumbtack`
 - Run `make build` to build the CLI
-- Run `make install` to install the CLI to your `$GOPATH/bin` directory.
-
-To build the CLI, run `make build`. This will build the CLI and place it in the `bin` directory.
+- Look in the `bin` directory for the `thumbtack` executable for Linux (amd64 and arm64) and Dawin/MacOS (amd64 and arm64)
 
 ## Pinboard Authentication and User Tokens
 This client only supports `API authentication tokens` for authentication. The client does not support `Regular HTTP Auth`. Users can find their API token on their settings page: https://pinboard.in/settings/password.
